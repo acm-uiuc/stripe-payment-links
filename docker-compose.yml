@@ -1,6 +1,6 @@
 services:
   shorten:
-    build: .
+    image: epochml/link-shortener:latest
     restart: on-failure
     environment:
       - DB_VENDOR=sqlite
