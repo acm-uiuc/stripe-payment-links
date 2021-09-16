@@ -106,3 +106,4 @@ dist
 keycloak.json
 sessions.sqlite3
 db.sqlite3
+backups/
