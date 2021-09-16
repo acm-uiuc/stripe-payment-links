@@ -19,7 +19,7 @@
     "express-session": "^1.17.2",
     "forever": "^4.0.1",
     "hogan-express": "^0.5.2",
-    "keycloak-connect": "^12.0.1",
+    "keycloak-connect": "^15.0.2",
     "node-fetch": "^3.0.0",
     "nodemon": "^2.0.12",
     "passport": "^0.4.1",
