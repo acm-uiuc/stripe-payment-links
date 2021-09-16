@@ -11,5 +11,5 @@ services:
     ports:
       - "9215:9215"
     volumes:
-      - ${PWD}/db.sqlite3:/data/db.sqlite3
-      - ${PWD}/sessions.sqlite3:/data/sessions.sqlite3
+      - ./db.sqlite3:/data/db.sqlite3
+      - ./sessions.sqlite3:/data/sessions.sqlite3
