@@ -1,6 +1,6 @@
 services:
   shorten:
-    build: .
+    image: epochml/link-shortener:latest
     restart: on-failure
     environment:
       - DB_VENDOR=sqlite
@@ -12,4 +12,4 @@ services:
       - "9215:9215"
     volumes:
       - ${PWD}/db.sqlite3:/data/db.sqlite3
-      - ${PWD}/sessions.sqlite3/:/data/sessions.sqlite3
+      - ${PWD}/sessions.sqlite3:/data/sessions.sqlite3
