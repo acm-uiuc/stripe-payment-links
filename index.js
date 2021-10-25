@@ -23,12 +23,11 @@ if (dbVendor === "postgresql") {
   })
   var store = new SQLiteStore({'dir': process.env.SESSION_DB_FILE_LOC, 'db': process.env.SESSION_DB_FILE_NAME});
 }
-
 var app = express();
 var server = app.listen(9215, function () {
   var host = server.address().address;
   var port = server.address().port;
-  console.log('Example app listening at http://%s:%s', host, port);
+  console.log('Listening on port %s', port);
 });
 app.set('view engine', 'html');
 app.set('views', require('path').join(__dirname, '/view'));
@@ -254,14 +253,20 @@ app.get('/login',
         response: res,                      // required
         resourceURL: config.resourceURL,    // optional. Provide a value if you want to specify the resource.
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
-        failureRedirect: '/' 
+        failureRedirect: '/error',
+        useCookieInsteadOfSession: true,
+        domain_hint: 'epochml.org'
       }
     )(req, res, next);
   },
   function(req, res) {
     res.redirect('/');
 });
+app.get('/error', (req, res) => {
+  res.status(500).send("An error occurred.")
+}
 
+);
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
 // query (such as authorization code). If authentication fails, user will be

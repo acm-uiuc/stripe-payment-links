@@ -1,3 +1,14 @@
+function makeSecret(length) {
+  let result           = '';
+  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]\;\',./<>?:"{}|';
+  const charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+
 exports.creds = {
     // Required
     identityMetadata: 'https://login.microsoftonline.com/epochml.onmicrosoft.com/v2.0/.well-known/openid-configuration', 
@@ -29,6 +40,8 @@ exports.creds = {
   
     // Required to set to false if you don't want to validate issuer
     validateIssuer: true,
+
+    isB2C: false,
   
     // Required if you want to provide the issuer(s) you want to validate instead of using the issuer from metadata
     // issuer could be a string or an array of strings of the following form: 'https://sts.windows.net/<tenant_guid>/v2.0'
@@ -46,7 +59,7 @@ exports.creds = {
     // rollover purpose. We always use the first set of key/iv pair to encrypt cookie, but we will try every set of
     // key/iv pair to decrypt cookie. Key can be any string of length 32, and iv can be any string of length 12.
     cookieEncryptionKeys: [ 
-      { 'key': 'D9!GEdo$xBcV!*%Nq@5sETWFbW8RGke&', 'iv': 'c&h5@EN&E2MX' },
+      { 'key': makeSecret(32), 'iv': makeSecret(12) },
     ],
   
     // The additional scopes we want besides 'openid'.
