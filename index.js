@@ -312,7 +312,7 @@ app.get('/logout', function(req, res){
 // begin business logic
 
 app.get('/', ensureAuthenticated, async function (req, res) {
-  res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups.map((item) => {return {group: item}}) })
+  res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
 
