@@ -312,7 +312,7 @@ app.get('/logout', function(req, res){
 // begin business logic
 
 app.get('/', ensureAuthenticated, async function (req, res) {
-  res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups.map((item) => {return {group: item}}) })
+  res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
 
@@ -359,7 +359,7 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
 app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
-  const userGroups = req.user._json.groups;
+  const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
   const data = await getDataForEmail(email).catch(() => {res.status(500).render('500'); return});
   const delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500'); return});
   res.render('mylinks', {
