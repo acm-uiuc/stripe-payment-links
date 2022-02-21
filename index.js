@@ -10,6 +10,7 @@ const config = require('./config');
 const passport = require('passport')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
+require('dotenv').config()
 
 if (dbVendor === "postgresql") {
   console.error("SQL support not yet implemented")
@@ -92,26 +93,7 @@ var findByOid = function(oid, fn) {
   return fn(null, null);
 };
 
-passport.use(new OIDCStrategy({
-  identityMetadata: config.creds.identityMetadata,
-  clientID: config.creds.clientID,
-  responseType: config.creds.responseType,
-  responseMode: config.creds.responseMode,
-  redirectUrl: config.creds.redirectUrl,
-  allowHttpForRedirectUrl: config.creds.allowHttpForRedirectUrl,
-  clientSecret: config.creds.CLIENT_SECRET,
-  validateIssuer: config.creds.validateIssuer,
-  isB2C: config.creds.isB2C,
-  issuer: config.creds.issuer,
-  passReqToCallback: config.creds.passReqToCallback,
-  scope: config.creds.scope,
-  loggingLevel: config.creds.loggingLevel,
-  nonceLifetime: config.creds.nonceLifetime,
-  nonceMaxAmount: config.creds.nonceMaxAmount,
-  useCookieInsteadOfSession: config.creds.useCookieInsteadOfSession,
-  cookieEncryptionKeys: config.creds.cookieEncryptionKeys,
-  clockSkew: config.creds.clockSkew,
-},
+passport.use(new OIDCStrategy(config.creds,
 function(iss, sub, profile, accessToken, refreshToken, done) {
   if (!profile.oid) {
     return done(new Error("No oid found"), null);

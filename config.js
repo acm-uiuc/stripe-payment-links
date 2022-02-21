@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 function makeSecret(length) {
   let result           = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]\;\',./<>?:"{}|';
@@ -23,7 +25,7 @@ exports.creds = {
   
     // Required if `responseType` is 'code', 'id_token code' or 'code id_token'. 
     // If app key contains '\', replace it with '\\'.
-    CLIENT_SECRET: process.env.CLIENT_SECRET, 
+    clientSecret: process.env.CLIENT_SECRET, 
   
     // Required, must be 'code', 'code id_token', 'id_token code' or 'id_token'
     // If you want to get access_token, you must use 'code', 'code id_token' or 'id_token code' 
