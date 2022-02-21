@@ -1,6 +1,6 @@
-# Epoch Link Shortener
+# Linkry - Epoch Link Shortener
 
-The Epoch Link Shortener is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an Epoch-controlled link.
+Linkry is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an Epoch-controlled link.
 
 ## Installation
 
@@ -19,7 +19,7 @@ yarn dev
 
 ## Usage
 
-This tool integrates with Azure AD to only allow authorized Epoch users to create links redirections. After you log in with your Epoch credentials, you will be presented with a portal that will allow you to shorten links. In the navigation bar, there is also a "My Links" tab that will allow you to delete or edit any links you have previously made. 
+Linkry integrates with Azure AD to only allow authorized Epoch users to create links redirections. After you log in with your Epoch credentials, you will be presented with a portal that will allow you to shorten links. In the navigation bar, there is also a "My Links" tab that will allow you to delete or edit any links you have previously made. 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -28,4 +28,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Maintainer: Dev Singh (<dsingh@imsa.edu>)
 
 ## License
-[BSD 3-Clause](https://raw.githubusercontent.com/epochml/link-shortener/master/LICENSE)
+[BSD 3-Clause](https://raw.githubusercontent.com/epochml/linkry/master/LICENSE)
