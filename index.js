@@ -8,6 +8,7 @@ const sqlite3 = require('sqlite3')
 const dbVendor = process.env.DB_VENDOR;
 const config = require('./config');
 const passport = require('passport')
+const fetch = require('node-fetch')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
 require('dotenv').config()
@@ -92,6 +93,25 @@ var findByOid = function(oid, fn) {
   }
   return fn(null, null);
 };
+getUserGroups = async (oid, accessToken) => {
+  const headers = {
+    "Authorization": `Bearer ${accessToken}`,
+    "Content-Type": "application/json"
+  };
+  const requestOptions = {
+    method: 'GET',
+    headers: headers,
+    redirect: 'follow'
+  };
+  return await fetch(`https://graph.microsoft.com/v1.0/users/${oid}/transitiveMemberOf/microsoft.graph.group?$select=displayName`, requestOptions)
+  .then(response => response.json())
+  .then(result => {
+    const groups = result.value;
+    const cleanGroups = groups.map(x => x["displayName"])
+    return cleanGroups
+  })
+  .catch(error => console.log('error', error));
+}
 
 passport.use(new OIDCStrategy(config.creds,
 function(iss, sub, profile, accessToken, refreshToken, done) {
@@ -100,12 +120,14 @@ function(iss, sub, profile, accessToken, refreshToken, done) {
   }
   // asynchronous verification, for effect...
   process.nextTick(function () {
-    findByOid(profile.oid, function(err, user) {
+    findByOid(profile.oid, async function(err, user) {
       if (err) {
         return done(err);
       }
-      if (!user) {
+      if (!user){
         // "Auto-registration"
+        // grab user groups from Graph API - groups in claim not reliable
+        profile._json.groups = await getUserGroups(profile.oid, accessToken)
         users.push(profile);
         return done(null, profile);
       }
@@ -339,6 +361,7 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
 });
 
 app.get('/mylinks', ensureAuthenticated, async function (req, res) {
+  console.log(req.user)
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
   const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
