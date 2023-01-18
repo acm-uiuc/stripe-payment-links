@@ -12,5 +12,6 @@ services:
     ports:
       - "9215:9215"
     volumes:
+      - ./config.js:/data/config.js
       - ./db.sqlite3:/data/db.sqlite3
       - ./sessions.sqlite3:/data/sessions.sqlite3
