@@ -335,12 +335,11 @@ function intersect_safe(a, b)
 
 // group access check
 app.use(async (req, res, next) => {
-  console.log("Checking access");
   if (!req.user) {return next();}
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = intersect_safe(config.groups_permitted, req.user._json.groups)
   if (intserect.length == 0){
-    return res.send('You are not a member of an authorized group. You must be a member of the Azure AD group(s): ' + config.groups_permitted.toString() + ". If you believe this is in error , navigate to /logout and try again.")
+    return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replace(",", "<br />")})
   }
   next();
 })

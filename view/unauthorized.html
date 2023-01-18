@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <noscript>Your browser does not support JavaScript, but this site requires JavaScript!</noscript>
+    <head>
+        <title>Unauthorized - ACM Link Shortener</title>
+        <meta property="og:title" content="ACM Link Shortener" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/css/epoch.css">
+        <script src="/static/js/index.js"></script>
+    </head>
+    <body class="epoch-dark epoch-font">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand text-light" href="/">
+                  <img src="https://acm.illinois.edu/static/media/logo.2f0248eb309f30cfa2bf.png" height="30">&nbsp;&nbsp;Link Shortener
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+        <div class="px-4 py-5 my-5 text-center">
+            <img class="d-block mx-auto mb-4" src="https://acm.illinois.edu/static/media/logo.2f0248eb309f30cfa2bf.png" alt="ACM Logo">
+            <h1 class="display-5 fw-bold" style="color: white;">Unauthorized</h1>
+            <div class="col-lg-6 mx-auto">
+              <p class="lead mb-4" style="color: white;">You are not permitted to access the ACM link shortener.</p>
+              <p class="lead mb-4" style="color: white;">You must be a member of one of the following Azure AD groups:</p>
+              <p class="lead mb-4" style="color: white;">{{{groups}}}</p>
+              <p class="lead mb-4" style="color: white;">If you believe you are recieving this message in error, please logout and try again or contact your administrator.</p>
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-primary btn-lg px-4 gap-3" onclick="location.href='/logout'">Logout</button>
+              </div>
+            </div>
+          </div>
+    </body>
+</html>
