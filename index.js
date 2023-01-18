@@ -14,7 +14,7 @@ var cookieParser = require('cookie-parser');
 const atob = require('atob');
 
 require('dotenv').config()
-
+console.log("Node env: ", process.env.NODE_ENV)
 if (dbVendor === "postgresql") {
   console.error("SQL support not yet implemented")
   process.exit(2)
@@ -368,6 +368,7 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   data = data.map((item) => {
     const d = item;
     d.url = atob(d.url);
+    d.groups = d.groups.replace(',', "<br />")
     return d;
   })
   let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500'); return});
@@ -376,6 +377,7 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
     d.url = atob(d.url);
     return d;
   })
+  delegatedLinks = delegatedLinks.filter(word => word.email != email);
   res.render('mylinks', {
     data,
     name,

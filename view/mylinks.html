@@ -65,14 +65,16 @@
             <br />
             <table style="width:100%" class="table table-striped">
                 <tr>
-                    <th style="text-align: center;" scope="col">Original URL</th>
-                    <th style="text-align: center;" scope="col">Shortened URL</th>
+                    <th style="text-align: center;" scope="col">Original</th>
+                    <th style="text-align: center;" scope="col">Shortened</th>
+                    <th style="text-align: center;" scope="col">Groups</th>
                     <th style="text-align: center;" scope="col">Actions</th>
                 </tr>
                 {{#data}}
                 <tr id="urldata-{{name}}">
                     <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
                     <td style="text-align: center;"><a href="https://{{baseURL}}/{{name}}">https://{{baseURL}}/{{name}}</a></td>
+                    <td style="text-align: center;"><a>{{{groups}}}</a></td>
                     <td style="text-align: center;"><button type="button" class="btn btn-danger" onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a></td>
                 </tr>
                 {{/data}}

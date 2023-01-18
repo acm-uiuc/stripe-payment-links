@@ -61,7 +61,10 @@ exports.creds = {
     // rollover purpose. We always use the first set of key/iv pair to encrypt cookie, but we will try every set of
     // key/iv pair to decrypt cookie. Key can be any string of length 32, and iv can be any string of length 12.
     cookieEncryptionKeys: [ 
-      { 'key': makeSecret(32), 'iv': makeSecret(12) },
+      {
+        'key': process.env.NODE_ENV == "development" ? "TfGVn2Sn3WjFk3GNzvIvOw8aXh16NqFC" : makeSecret(32), 
+        'iv': process.env.NODE_ENV == "development" ? "C1fRcgVZs1K7" : makeSecret(12)
+      },
     ],
   
     // The additional scopes we want besides 'openid'.
