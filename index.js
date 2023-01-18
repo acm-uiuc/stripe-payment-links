@@ -312,6 +312,38 @@ app.get('/logout', function(req, res){
     res.redirect(config.destroySessionUrl);
   });
 });
+function intersect_safe(a, b)
+{
+  var ai=0, bi=0;
+  var result = [];
+
+  while( ai < a.length && bi < b.length )
+  {
+     if      (a[ai] < b[bi] ){ ai++; }
+     else if (a[ai] > b[bi] ){ bi++; }
+     else /* they're equal */
+     {
+       result.push(a[ai]);
+       ai++;
+       bi++;
+     }
+  }
+
+  return result;
+}
+
+
+// group access check
+app.use(async (req, res, next) => {
+  console.log("Checking access");
+  if (!req.user) {return next();}
+  req.user._json.groups = await getUserGroups(req.user.oid, gat);
+  const intserect = intersect_safe(config.groups_permitted, req.user._json.groups)
+  if (intserect.length == 0){
+    return res.send('You are not a member of an authorized group. You must be a member of the Azure AD group(s): ' + config.groups_permitted.toString())
+  }
+  next();
+})
 
 // begin business logic
 
@@ -322,7 +354,6 @@ app.get('/', async function (req, res) {
 })
 
 app.get('/create', ensureAuthenticated, async function (req, res) {
-  req.user._json.groups = await getUserGroups(req.user.oid, gat);
   res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
