@@ -9,7 +9,7 @@
     "dev": "SESSION_DB_FILE_LOC=${PWD} SESSION_DB_FILE_NAME=sessions.sqlite3 DB_VENDOR=sqlite DB_FILE=${PWD}/db.sqlite3 nodemon index.js",
     "container-start": "node index.js"
   },
-  "author": "Dev Singh <dsingh@imsa.edu>",
+  "author": "Dev Singh <dsingh14@illinois.edu>",
   "license": "BSD-3-Clause",
   "dependencies": {
     "connect-sqlite3": "^0.9.12",

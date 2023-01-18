@@ -13,7 +13,7 @@ function makeSecret(length) {
 
 exports.creds = {
     // Required
-    identityMetadata: 'https://login.microsoftonline.com/acmillinois.onmicrosoft.com/v2.0/.well-known/openid-configuration', 
+    identityMetadata: 'https://login.microsoftonline.com/c8d9148f-9a59-4db3-827d-42ea0c2b6e2e/v2.0/.well-known/openid-configuration', 
     // or equivalently: 'https://login.microsoftonline.com/<tenant_guid>/v2.0/.well-known/openid-configuration'
     //
     // or you can use the common endpoint
