@@ -147,6 +147,7 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 };
 
+
 async function addURLToDB(name, url, email, groups) {
   return new Promise(function(resolve, reject) {
     db.serialize(function() {
@@ -301,7 +302,7 @@ app.post('/auth/openid/return',
     )(req, res, next);
   },
   function(req, res) {
-    res.redirect('/');
+    res.redirect('/create');
   });
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
@@ -314,7 +315,13 @@ app.get('/logout', function(req, res){
 
 // begin business logic
 
-app.get('/', ensureAuthenticated, async function (req, res) {
+app.get('/', async function (req, res) {
+  if (req.isAuthenticated()) { return res.redirect('/create') }
+  res.render('home.html');
+  return
+})
+
+app.get('/create', ensureAuthenticated, async function (req, res) {
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
