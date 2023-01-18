@@ -2,7 +2,7 @@ const hogan = require('hogan-express');
 const express = require('express');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
-const baseURL = process.env.baseURL || 'go.epochml.org';
+const baseURL = process.env.baseURL || 'go.acm.illinois.edu';
 const favicon = require('serve-favicon');
 const sqlite3 = require('sqlite3')
 const dbVendor = process.env.DB_VENDOR;
@@ -259,7 +259,7 @@ app.get('/login',
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
         failureRedirect: '/error',
         useCookieInsteadOfSession: true,
-        domain_hint: 'epochml.org'
+        domain_hint: 'illinois.edu'
       }
     )(req, res, next);
   },

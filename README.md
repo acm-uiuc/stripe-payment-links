@@ -1,10 +1,10 @@
-# Linkry - Epoch Link Shortener
+# Linkry - ACM @ UIUC Link Shortener
 
-Linkry is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an Epoch-controlled link.
+Linkry is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an ACM-controlled link.
 
 ## Installation
 
-Ensure that you have [Node](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/) installed on your machine. For non-Epoch users, configure config.js to use your AAD tenant's client ID.
+Ensure that you have [Node](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/) installed on your machine. For non-ACM users, configure config.js to use your AAD tenant's client ID.
 Then, run the following commands:
 ```bash
 yarn
@@ -28,4 +28,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Maintainer: Dev Singh (<dsingh@imsa.edu>)
 
 ## License
-[BSD 3-Clause](https://raw.githubusercontent.com/epochml/linkry/master/LICENSE)
+[BSD 3-Clause](https://raw.githubusercontent.com/acm-uiuc/linkry/master/LICENSE)

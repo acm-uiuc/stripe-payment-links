@@ -13,7 +13,7 @@ function makeSecret(length) {
 
 exports.creds = {
     // Required
-    identityMetadata: 'https://login.microsoftonline.com/epochml.onmicrosoft.com/v2.0/.well-known/openid-configuration', 
+    identityMetadata: 'https://login.microsoftonline.com/acmillinois.onmicrosoft.com/v2.0/.well-known/openid-configuration', 
     // or equivalently: 'https://login.microsoftonline.com/<tenant_guid>/v2.0/.well-known/openid-configuration'
     //
     // or you can use the common endpoint
@@ -21,7 +21,7 @@ exports.creds = {
     // To use the common endpoint, you have to either turn `validateIssuer` off, or provide the `issuer` value.
   
     // Required, the client ID of your app in AAD  
-    clientID: 'a971b54f-17f1-4f52-9aa8-d887f0fad0f6',
+    clientID: '1e783026-31ac-4844-b918-d6eb26ace2f2',
   
     // Required if `responseType` is 'code', 'id_token code' or 'code id_token'. 
     // If app key contains '\', replace it with '\\'.
@@ -35,7 +35,7 @@ exports.creds = {
     responseMode: 'form_post', 
   
     // Required, the reply URL registered in AAD for your app
-    redirectUrl: process.env.baseURL ? `http://${process.env.baseURL}/auth/openid/return`: `https://go.epochml.org/auth/openid/return`, 
+    redirectUrl: process.env.baseURL ? `http://${process.env.baseURL}/auth/openid/return`: `https://go.acm.illinois.edu/auth/openid/return`, 
   
     // Required if we use http for redirectUrl
     allowHttpForRedirectUrl: true,
