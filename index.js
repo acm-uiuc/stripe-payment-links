@@ -259,7 +259,7 @@ app.get('/login',
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
         failureRedirect: '/error',
         useCookieInsteadOfSession: true,
-        domain_hint: 'illinois.edu'
+        domain_hint: 'acm.illinois.edu'
       }
     )(req, res, next);
   },
