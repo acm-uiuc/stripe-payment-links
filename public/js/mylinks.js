@@ -16,7 +16,7 @@ async function handleEdit(name, url) {
             return
         }
     }
-    const response = await fetch(`/updateLink?name=${name}&url=${newURL}`, {
+    const response = await fetch(`/updateLink?name=${name}&url=${btoa(newURL)}`, {
         method: "PUT"
     })
     if (response.status !== 200) {

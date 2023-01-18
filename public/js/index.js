@@ -44,7 +44,7 @@ async function submitData() {
         return
     }
     const groups = await getGroups()
-    const response = await fetch(`/addURL?url=${url}&name=${name}`, {
+    const response = await fetch(`/addURL?url=${btoa(url)}&name=${name}`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

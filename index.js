@@ -11,6 +11,8 @@ const passport = require('passport')
 const fetch = require('node-fetch')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
+const atob = require('atob');
+
 require('dotenv').config()
 
 if (dbVendor === "postgresql") {
@@ -364,8 +366,18 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
   const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
-  const data = await getDataForEmail(email).catch(() => {res.status(500).render('500'); return});
-  const delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500'); return});
+  let data = await getDataForEmail(email).catch(() => {res.status(500).render('500'); return});
+  data = data.map((item) => {
+    const d = item;
+    d.url = atob(d.url);
+    return d;
+  })
+  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500'); return});
+  delegatedLinks = delegatedLinks.map((item) => {
+    const d = item;
+    d.url = atob(d.url);
+    return d;
+  })
   res.render('mylinks', {
     data,
     name,
@@ -442,7 +454,7 @@ app.get('/:id', async function (req, res) {
   try {
     const url = await getRedirectURL(name)
     if (url[0] !== undefined) {
-      res.redirect(url[0].url)
+      res.redirect(atob(url[0].url))
       return
     } else {
       res.status(404).render('404')
