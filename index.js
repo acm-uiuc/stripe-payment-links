@@ -115,6 +115,7 @@ getUserGroups = async (oid, accessToken) => {
   .catch(error => console.log('error', error));
 }
 
+var gat = "";
 passport.use(new OIDCStrategy(config.creds,
 function(iss, sub, profile, accessToken, refreshToken, done) {
   if (!profile.oid) {
@@ -126,14 +127,10 @@ function(iss, sub, profile, accessToken, refreshToken, done) {
       if (err) {
         return done(err);
       }
-      if (!user){
-        // "Auto-registration"
-        // grab user groups from Graph API - groups in claim not reliable
-        profile._json.groups = await getUserGroups(profile.oid, accessToken)
-        users.push(profile);
-        return done(null, profile);
-      }
-      return done(null, user);
+      gat = accessToken;
+      profile._json.groups = await getUserGroups(profile.oid, accessToken)
+      users.push(profile);
+      return done(null, profile);
     });
   });
 }
@@ -318,6 +315,7 @@ app.get('/logout', function(req, res){
 // begin business logic
 
 app.get('/', ensureAuthenticated, async function (req, res) {
+  req.user._json.groups = await getUserGroups(req.user.oid, gat);
   res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
