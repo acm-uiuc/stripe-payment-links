@@ -361,7 +361,6 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
 });
 
 app.get('/mylinks', ensureAuthenticated, async function (req, res) {
-  console.log(req.user)
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
   const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];

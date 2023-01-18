@@ -15,7 +15,6 @@ async function getRandomURL() {
         alert("Could not generate a random URL. Please, try again.")
         return
     }
-    console.log(resp.generatedURL, response.status === 200 && resp.success === true)
     if (response.status === 200 && resp.success === true) {
         document.getElementById("name").value = resp.generatedURL
     } else {
@@ -45,7 +44,6 @@ async function submitData() {
         return
     }
     const groups = await getGroups()
-    console.log(groups)
     const response = await fetch(`/addURL?url=${url}&name=${name}`, {
         method: "POST",
         headers: {
