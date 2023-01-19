@@ -347,7 +347,7 @@ app.use(async (req, res, next) => {
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = intersect_safe(config.groups_permitted, req.user._json.groups)
   if (intserect.length == 0){
-    return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replace(",", "<br />")})
+    return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replaceAll(",", "<br />")})
   }
   next();
 })
