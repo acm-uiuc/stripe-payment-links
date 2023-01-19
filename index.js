@@ -339,15 +339,21 @@ function intersect_safe(a, b)
 
   return result;
 }
-
+function validateArray(userGroups, accessGroups) {
+  for (const item of userGroups) {
+    if (accessGroups.includes(item)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // group access check
 app.use(async (req, res, next) => {
   if (!req.user) {return next();}
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
-  const intserect = intersect_safe(config.groups_permitted, req.user._json.groups);
-  console.log(req.user._json.preferred_username, intserect, req.user._json.groups );
-  if (intserect.length == 0){
+  const intserect = validateArray(config.groups_permitted, req.user._json.groups);
+  if (!intserect){
     return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replaceAll(",", "<br />")})
   }
   next();
