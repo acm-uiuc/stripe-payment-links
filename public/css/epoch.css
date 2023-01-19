@@ -4,13 +4,13 @@
     font-style: normal;
 }
 .epoch-dark {
-    background-color: #1E1E24;
-    color: #1E1E24;
+    background-color: #1B1B1B;
+    color: #1B1B1B;
 }
 
 .epoch-child-dark {
-    background-color: #1E1E24;
-    color: #1E1E24;
+    background-color: #1B1B1B;
+    color: #1B1B1B;
 }
 
 .epoch-light {
@@ -34,4 +34,8 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: #0053B3 !important;
 }
