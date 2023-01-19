@@ -1,102 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-    <noscript>Your browser does not support JavaScript, but this site requires JavaScript!</noscript>
-    <head>
-        <title>ACM @ UIUC Link Shortener</title>
-        <meta property="og:title" content="ACM @ UIUC Link Shortener" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-        <link rel="stylesheet" href="/static/css/epoch.css">
-        <script src="/static/js/mylinks.js"></script>
-    </head>
-    <script>
-        async function handleRemove(name) {
-            const sure = confirm(`Are you sure you would like to remove this link? Anyone visiting https://{{baseURL}}/${name} will recieve an error!`);
-            if (!sure) {
-                alert("Remove cancelled.")
-                return
-            }
-            const response = await fetch(`/deleteLink?name=${name}`, {
-                method: "DELETE"
-            })
-            const parsed = await response.json()
-            if (response.status !== 200) {
-                alert(parsed.message)
-            } else  {
-                alert("URL removed successfully!")
-                document.getElementById(`urldata-${name}`).parentNode.removeChild(document.getElementById(`urldata-${name}`))
-            }
+<noscript>Your browser does not support JavaScript, but this site requires JavaScript!</noscript>
+
+<head>
+    <title>ACM @ UIUC Link Shortener</title>
+    <meta property="og:title" content="ACM @ UIUC Link Shortener" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/epoch.css">
+    <script src="/static/js/mylinks.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<script>
+    async function handleRemove(name) {
+        const sure = confirm(`Are you sure you would like to remove this link? Anyone visiting {{baseURL}}/${name} will recieve an error!`);
+        if (!sure) {
+            alert("Remove cancelled.")
+            return
         }
-    </script>
-    <body class="epoch-dark epoch-font epoch-child-light">
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid">
-                <a class="navbar-brand text-light" href="/create">
-                  <img src="https://acm.illinois.edu/static/media/logo.2f0248eb309f30cfa2bf.png" height="30">&nbsp;&nbsp;Link Shortener
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto flex-nowrap mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link text-light active" aria-current="page">My Links</a>
+        const response = await fetch(`/deleteLink?name=${name}`, {
+            method: "DELETE"
+        })
+        const parsed = await response.json()
+        if (response.status !== 200) {
+            alert(parsed.message)
+        } else {
+            alert("URL removed successfully!")
+            document.getElementById(`urldata-${name}`).parentNode.removeChild(document.getElementById(`urldata-${name}`))
+        }
+    }
+</script>
+
+<body class="epoch-dark epoch-font epoch-child-light">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light" href="/create">
+                <img src="/static/img/white-banner.svg" height="50">&nbsp;&nbsp;Link Shortener
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto flex-nowrap mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" aria-current="page" href="/mylinks">My Links</a>
+                    </li>
+                </ul>
+                <div class="dropstart dropdown-menu-md">
+                    <a href="#" class="d-block text-white text-decoration-none dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Signed in as: {{name}}
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li><a class="dropdown-item disabled" href="#">Email: {{email}}</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" aria-current="page" href="/logout">Logout</a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item" style="float: right; margin-right: 0;">
-                            <i class="nav-link disabled text-light" href="#" tabindex="-1" aria-disabled="true">Signed in as {{name}}
-                                ({{email}})</i>
-                        </li>
+                        <li><a class="dropdown-item text-dark" href="/logout">Logout</a></li>
                     </ul>
                 </div>
             </div>
-        </nav>
-        <br />
-        <div class="container">
-            <h1 style="text-align: center;">Your shortened links</h1>
-            <br />
-            <table style="width:100%" class="table table-striped">
-                <tr>
-                    <th style="text-align: center;" scope="col">Original</th>
-                    <th style="text-align: center;" scope="col">Shortened</th>
-                    <th style="text-align: center;" scope="col">Groups</th>
-                    <th style="text-align: center;" scope="col">Actions</th>
-                </tr>
-                {{#data}}
-                <tr id="urldata-{{name}}">
-                    <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
-                    <td style="text-align: center;"><a href="https://{{baseURL}}/{{name}}">https://{{baseURL}}/{{name}}</a></td>
-                    <td style="text-align: center;"><a>{{{groups}}}</a></td>
-                    <td style="text-align: center;"><button type="button" class="btn btn-danger" onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a></td>
-                </tr>
-                {{/data}}
-            </table>
-            {{#delegatedLinks.length}}
-            <h1 style="text-align: center;">Your delegated links</h1>
-            <br />
-            <table style="width:100%" class="table table-striped">
-                <tr>
-                    <th style="text-align: center;" scope="col">Original URL</th>
-                    <th style="text-align: center;" scope="col">Shortened URL</th>
-                    <th style="text-align: center;" scope="col">Owner</th>
-                    <th style="text-align: center;" scope="col">Actions</th>
-                </tr>
-                    {{#delegatedLinks}}
-                    <tr id="urldata-{{name}}">
-                        <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
-                        <td style="text-align: center;"><a href="https://{{baseURL}}/{{name}}">https://{{baseURL}}/{{name}}</a></td>
-                        <td style="text-align: center;"><a>{{email}}</a></td>
-                        <td style="text-align: center;"><button type="button" class="btn btn-danger" onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a></td>
-                    </tr>
-                    {{/delegatedLinks}}                
-            </table>
-            {{/delegatedLinks.length}}
         </div>
+    </nav>
+    <br />
+    <div class="container">
+        <h1 style="text-align: center;">Your shortened links</h1>
+        <br />
+        <table style="width:100%" class="table table-striped">
+            <tr>
+                <th style="text-align: center;" scope="col">Original</th>
+                <th style="text-align: center;" scope="col">Shortened</th>
+                <th style="text-align: center;" scope="col">Groups</th>
+                <th style="text-align: center;" scope="col">Actions</th>
+            </tr>
+            {{#data}}
+            <tr id="urldata-{{name}}">
+                <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
+                <td style="text-align: center;"><a href="{{baseURL}}/{{name}}">{{baseURL}}/{{name}}</a></td>
+                <td style="text-align: center;"><a>{{{groups}}}</a></td>
+                <td style="text-align: center;"><button type="button" class="btn btn-danger"
+                        onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button
+                        type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a>
+                </td>
+            </tr>
+            {{/data}}
+        </table>
+        {{#delegatedLinks.length}}
+        <h1 style="text-align: center;">Your delegated links</h1>
+        <br />
+        <table style="width:100%" class="table table-striped">
+            <tr>
+                <th style="text-align: center;" scope="col">Original URL</th>
+                <th style="text-align: center;" scope="col">Shortened URL</th>
+                <th style="text-align: center;" scope="col">Owner</th>
+                <th style="text-align: center;" scope="col">Actions</th>
+            </tr>
+            {{#delegatedLinks}}
+            <tr id="urldata-{{name}}">
+                <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
+                <td style="text-align: center;"><a href="{{baseURL}}/{{name}}">{{baseURL}}/{{name}}</a></td>
+                <td style="text-align: center;"><a>{{email}}</a></td>
+                <td style="text-align: center;"><button type="button" class="btn btn-danger"
+                        onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button
+                        type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a>
+                </td>
+            </tr>
+            {{/delegatedLinks}}
+        </table>
+        {{/delegatedLinks.length}}
+    </div>
+    <div class="container fixed-bottom">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <span class="mb-3 mb-md-0 text-white">©
+                    <script>document.write(new Date().getFullYear())</script> ACM @ UIUC
+                </span>
+            </div>
+            <ul class="nav col-md-4 justify-content-end">
+                <li class="nav-item"><a href="https://acm.illinois.edu" class="nav-link px-2 text-white">ACM @ UIUC
+                        Home</a></li>
+                <li class="nav-item"><a href="https://status.acm.illinois.edu/" class="nav-link px-2 text-white">System
+                        Status</a></li>
+            </ul>
+        </footer>
+    </div>
+</body>
 
-    </body>
 </html>

@@ -10,7 +10,7 @@ function makeSecret(length) {
   return result;
 }
 
-exports.groups_permitted = ['ACM Link Shortener Managers'];
+exports.groups_permitted = ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
 
 exports.creds = {
     // Required

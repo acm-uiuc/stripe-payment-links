@@ -276,9 +276,10 @@ app.get('/login',
 });
 app.get('/error', (req, res) => {
   res.status(500).send("An error occurred.")
-}
-
-);
+});
+app.get('/unauthorized', (req, res) => {
+  return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
+});
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
 // query (such as authorization code). If authentication fails, user will be
@@ -354,7 +355,7 @@ app.use(async (req, res, next) => {
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = validateArray(config.groups_permitted, req.user._json.groups);
   if (!intserect){
-    return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replaceAll(",", "<br />")})
+    return res.status(401).redirect("/unauthorized");
   }
   next();
 })
