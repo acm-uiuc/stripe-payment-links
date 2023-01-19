@@ -108,9 +108,17 @@ getUserGroups = async (oid, accessToken) => {
   return await fetch(`https://graph.microsoft.com/v1.0/users/${oid}/transitiveMemberOf/microsoft.graph.group?$select=displayName`, requestOptions)
   .then(response => response.json())
   .then(result => {
-    const groups = result.value;
-    const cleanGroups = groups.map(x => x["displayName"])
-    return cleanGroups
+    let groups;
+    let cleanGroups;
+    try {
+      groups = result.value;
+      cleanGroups = groups.map(x => x["displayName"])
+      return cleanGroups
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+    
   })
   .catch(error => console.log('error', error));
 }
