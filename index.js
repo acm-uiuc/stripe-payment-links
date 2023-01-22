@@ -12,13 +12,14 @@ const atob = require('atob');
 const config = require('./config');
 
 require('dotenv').config()
-const {baseURL, baseProto} = process.env;
+const {BASE_PROTO} = process.env;
+const baseURL = process.env.BASE_URL;
 
-if (!baseURL || !baseProto) {
+if (!baseURL || !BASE_PROTO) {
   console.error("ERROR: Cannot find base URL or protocol, exiting...");
   return;
 } else {
-  console.log(`Running at ${baseProto}://${baseURL}`)
+  console.log(`Running at ${BASE_PROTO}://${baseURL}`)
 }
 
 console.log("Node env: ", process.env.NODE_ENV)

@@ -46,7 +46,7 @@ exports.creds = {
     responseMode: 'form_post', 
   
     // Required, the reply URL registered in AAD for your app
-    redirectUrl: `${process.env.baseProto}://${process.env.baseURL}/auth/openid/return`,
+    redirectUrl: `${process.env.BASE_PROTO}://${process.env.baseURL}/auth/openid/return`,
     // Required if we use http for redirectUrl
     allowHttpForRedirectUrl: true,
   
@@ -97,7 +97,7 @@ exports.creds = {
   };
   
   // The url you need to go to destroy the session with AAD
-  exports.destroySessionUrl = `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=${process.env.baseProto}://${process.env.baseURL}`
+  exports.destroySessionUrl = `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=${process.env.BASE_PROTO}://${process.env.baseURL}`
   
   // If you want to use the mongoDB session store for session middleware, set to true; otherwise we will use the default
   // session store provided by express-session.
