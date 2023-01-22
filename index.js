@@ -1,6 +1,6 @@
 const hogan = require('hogan-express');
 const express = require('express');
-const session = require('express-session');
+const session = require('cookie-session');
 const favicon = require('serve-favicon');
 const sqlite3 = require('sqlite3')
 const passport = require('passport')
