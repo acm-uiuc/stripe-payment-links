@@ -10,7 +10,7 @@ function makeSecret(length) {
   return result;
 }
 
-exports.groups_permitted = process.env.groupsPermitted ? process.env.groupsPermitted.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
+exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
 
 exports.branding = {
   title: process.env.brandTitle || "ACM Link Shortener",
