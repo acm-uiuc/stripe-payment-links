@@ -32,7 +32,7 @@ exports.creds = {
     // To use the common endpoint, you have to either turn `validateIssuer` off, or provide the `issuer` value.
   
     // Required, the client ID of your app in AAD  
-    clientID: process.env.AAD_CLIENT_SECRET,
+    clientID: process.env.AAD_CLIENT_ID,
   
     // Required if `responseType` is 'code', 'id_token code' or 'code id_token'. 
     // If app key contains '\', replace it with '\\'.
