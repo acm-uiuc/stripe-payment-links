@@ -1,32 +1,34 @@
 const hogan = require('hogan-express');
 const express = require('express');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
-const baseURL = process.env.baseURL || 'go.acm.illinois.edu';
 const favicon = require('serve-favicon');
 const sqlite3 = require('sqlite3')
-const dbVendor = process.env.DB_VENDOR;
-const config = require('./config');
 const passport = require('passport')
 const fetch = require('node-fetch')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
 const atob = require('atob');
 
+const config = require('./config');
+
 require('dotenv').config()
-console.log("Node env: ", process.env.NODE_ENV)
-if (dbVendor === "postgresql") {
-  console.error("SQL support not yet implemented")
-  process.exit(2)
+const {baseURL, baseProto} = process.env;
+
+if (!baseURL || !baseProto) {
+  console.error("ERROR: Cannot find base URL or protocol, exiting...");
+  return;
 } else {
-  var db = new sqlite3.Database(process.env.DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
-    if (err) {
-      console.error(err.message);
-      process.exit(1);
-    }
-  })
-  var store = new SQLiteStore({'dir': process.env.SESSION_DB_FILE_LOC, 'db': process.env.SESSION_DB_FILE_NAME});
+  console.log(`Running at ${baseProto}://${baseURL}`)
 }
+
+console.log("Node env: ", process.env.NODE_ENV)
+var db = new sqlite3.Database(process.env.DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
+  if (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+})
+
 var app = express();
 var server = app.listen(9215, function () {
   var host = server.address().address;
@@ -64,7 +66,6 @@ app.use(session({
   secret: secret,
   resave: false,
   saveUninitialized: true,
-  store: process.env.NODE_ENV === "development" ? undefined : store
 }));
 
 //-----------------------------------------------------------------------------
@@ -267,7 +268,7 @@ app.get('/login',
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
         failureRedirect: '/error',
         useCookieInsteadOfSession: true,
-        domain_hint: 'acm.illinois.edu'
+        domain_hint: config.branding.domainHint
       }
     )(req, res, next);
   },
@@ -278,7 +279,7 @@ app.get('/error', (req, res) => {
   res.status(500).send("An error occurred.")
 });
 app.get('/unauthorized', (req, res) => {
-  return res.status(401).render('unauthorized.html', {groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
+  return res.status(401).render('unauthorized.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
 });
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
@@ -364,12 +365,12 @@ app.use(async (req, res, next) => {
 
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) { return res.redirect('/create') }
-  res.render('home.html');
+  res.render('home.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
   return
 })
 
 app.get('/create', ensureAuthenticated, async function (req, res) {
-  res.render('index.html', { email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
+  res.render('index.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
 
@@ -417,14 +418,14 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
   const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
-  let data = await getDataForEmail(email).catch(() => {res.status(500).render('500'); return});
+  let data = await getDataForEmail(email).catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
   data = data.map((item) => {
     const d = item;
     d.url = atob(d.url);
     d.groups = d.groups.replace(',', "<br />")
     return d;
   })
-  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500'); return});
+  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
   delegatedLinks = delegatedLinks.map((item) => {
     const d = item;
     d.url = atob(d.url);
@@ -436,7 +437,8 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
     name,
     email,
     baseURL,
-    delegatedLinks
+    delegatedLinks,
+    productName: config.branding.title
   })
 })
 
@@ -510,11 +512,11 @@ app.get('/:id', async function (req, res) {
       res.redirect(atob(url[0].url))
       return
     } else {
-      res.status(404).render('404')
+      res.status(404).render('404', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
       return
     }
   } catch {
-    res.status(500).render('500')
+    res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
     return
   }
 

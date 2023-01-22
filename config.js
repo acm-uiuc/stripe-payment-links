@@ -12,9 +12,19 @@ function makeSecret(length) {
 
 exports.groups_permitted = ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
 
+exports.branding = {
+  title: "ACM Link Shortener",
+  loginProvider: "ACM",
+  logoPath: "/static/img/white-banner.svg",
+  orgHome: "https://acm.illinois.edu",
+  statusURL: "https://status.acm.illinois.edu",
+  copyrightOwner: "ACM @ UIUC",
+  domainHint: "acm.illinois.edu" // primary azure AD domain for tenant.
+}
+
 exports.creds = {
     // Required
-    identityMetadata: 'https://login.microsoftonline.com/c8d9148f-9a59-4db3-827d-42ea0c2b6e2e/v2.0/.well-known/openid-configuration', 
+    identityMetadata: `https://login.microsoftonline.com/${process.env.AAD_TENANT_ID}/v2.0/.well-known/openid-configuration`, 
     // or equivalently: 'https://login.microsoftonline.com/<tenant_guid>/v2.0/.well-known/openid-configuration'
     //
     // or you can use the common endpoint
@@ -22,11 +32,11 @@ exports.creds = {
     // To use the common endpoint, you have to either turn `validateIssuer` off, or provide the `issuer` value.
   
     // Required, the client ID of your app in AAD  
-    clientID: '1e783026-31ac-4844-b918-d6eb26ace2f2',
+    clientID: process.env.AAD_CLIENT_SECRET,
   
     // Required if `responseType` is 'code', 'id_token code' or 'code id_token'. 
     // If app key contains '\', replace it with '\\'.
-    clientSecret: process.env.CLIENT_SECRET, 
+    clientSecret: process.env.AAD_CLIENT_SECRET, 
   
     // Required, must be 'code', 'code id_token', 'id_token code' or 'id_token'
     // If you want to get access_token, you must use 'code', 'code id_token' or 'id_token code' 
@@ -36,8 +46,7 @@ exports.creds = {
     responseMode: 'form_post', 
   
     // Required, the reply URL registered in AAD for your app
-    redirectUrl: process.env.baseURL ? `http://${process.env.baseURL}/auth/openid/return`: `https://go.acm.illinois.edu/auth/openid/return`, 
-  
+    redirectUrl: `${process.env.baseProto}://${process.env.baseURL}/auth/openid/return`,
     // Required if we use http for redirectUrl
     allowHttpForRedirectUrl: true,
   
@@ -88,7 +97,7 @@ exports.creds = {
   };
   
   // The url you need to go to destroy the session with AAD
-  exports.destroySessionUrl = process.env.baseURL ? `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:9215` : `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://go.epochml.org`;
+  exports.destroySessionUrl = `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=${process.env.baseProto}://${process.env.baseURL}`
   
   // If you want to use the mongoDB session store for session middleware, set to true; otherwise we will use the default
   // session store provided by express-session.

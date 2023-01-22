@@ -1,12 +1,12 @@
 {
-  "name": "acm-uiuc-link-shortener",
-  "version": "1.1.0",
+  "name": "linkry-link-shortener",
+  "version": "1.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "SESSION_DB_FILE_LOC=${PWD} SESSION_DB_FILE_NAME=sessions.sqlite3 DB_VENDOR=sqlite DB_FILE=${PWD}/db.sqlite3 forever start index.js",
+    "start": "DB_FILE=${PWD}/db.sqlite3 forever start index.js",
     "stop": "forever stop index.js",
-    "dev": "SESSION_DB_FILE_LOC=${PWD} SESSION_DB_FILE_NAME=sessions.sqlite3 DB_VENDOR=sqlite DB_FILE=${PWD}/db.sqlite3 nodemon index.js",
+    "dev": "DB_FILE=${PWD}/db.sqlite3 nodemon index.js",
     "container-start": "node index.js"
   },
   "author": "Dev Singh <dsingh14@illinois.edu>",

@@ -6,10 +6,10 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 		<meta charset="utf-8">
-		<meta property="og:title" content="404" />
+		<meta property="og:title" content="Error 404 - {{{productName}}}" />
 		<meta property="og:description" content="Page Not Found" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Error 404 - Page Not Found</title>
+		<title>Page Not Found - {{{productName}}}</title>
 	</head>
 	<body class="epoch-dark epoch-font">
 		<div id="notfound">
@@ -20,20 +20,20 @@
 				<br /> <br><br><br>
 				<p style="color: #EEF0F2;">The page you are looking for could not be found.</p>
 				<br><br><br>
-				<a href="https://acm.illinois.edu"><img src="/static/img/white-banner.svg" height="60"></a>
+				<a href="{{{orgHome}}}"><img src="{{{logoPath}}}" height="60"></a>
 			</div>
 		</div>
 	    <div class="container fixed-bottom">
 			<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
 				<div class="col-md-4 d-flex align-items-center">
 					<span class="mb-3 mb-md-0 text-white">©
-						<script>document.write(new Date().getFullYear())</script> ACM @ UIUC
+						<script>document.write(new Date().getFullYear())</script> {{{copyrightOwner}}}
 					</span>
 				</div>
 				<ul class="nav col-md-4 justify-content-end">
-					<li class="nav-item"><a href="https://acm.illinois.edu" class="nav-link px-2 text-white">ACM @ UIUC
+					<li class="nav-item"><a href="{{{orgHome}}}" class="nav-link px-2 text-white">{{{copyrightOwner}}}
 							Home</a></li>
-					<li class="nav-item"><a href="https://status.acm.illinois.edu/" class="nav-link px-2 text-white">System
+					<li class="nav-item"><a href="{{{statusURL}}}/" class="nav-link px-2 text-white">System
 							Status</a></li>
 				</ul>
 			</footer>

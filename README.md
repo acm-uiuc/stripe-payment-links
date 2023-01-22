@@ -1,6 +1,6 @@
-# Linkry - ACM @ UIUC Link Shortener
+# Linkry - Link Shortener
 
-Linkry is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an ACM-controlled link.
+Linkry is an internal tool for shortening links and reducing link rot by redirecting users to an origin site from an organization-controlled link.
 
 ## Installation
 

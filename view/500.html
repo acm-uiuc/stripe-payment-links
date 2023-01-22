@@ -8,9 +8,9 @@
 		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	<meta charset="utf-8">
 	<meta property="og:title" content="500" />
-	<meta property="og:description" content="Internal Server Error" />
+	<meta property="og:description" content="Error 500 - {{{productName}}}" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Error 500 - Internal Server Error</title>
+	<title>Error 500 - {{{productName}}}</title>
 </head>
 
 <body class="epoch-dark epoch-font">
@@ -24,20 +24,20 @@
 				again.</p>
 			<p style="color: #EEF0F2; font-size: 1.25em;"></p>
 			<br><br><br>
-			<a href="https://acm.illinois.edu"><img src="/static/img/white-banner.svg" height="60"></a>
+			<a href="{{{orgHome}}}"><img src="{{{logoPath}}}" height="60"></a>
 		</div>
 	</div>
 	<div class="container fixed-bottom">
 		<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
 			<div class="col-md-4 d-flex align-items-center">
 				<span class="mb-3 mb-md-0 text-white">©
-					<script>document.write(new Date().getFullYear())</script> ACM @ UIUC
+					<script>document.write(new Date().getFullYear())</script> {{{copyrightOwner}}}
 				</span>
 			</div>
 			<ul class="nav col-md-4 justify-content-end">
-				<li class="nav-item"><a href="https://acm.illinois.edu" class="nav-link px-2 text-white">ACM @ UIUC
+				<li class="nav-item"><a href="{{{orgHome}}}" class="nav-link px-2 text-white">{{{copyrightOwner}}}
 						Home</a></li>
-				<li class="nav-item"><a href="https://status.acm.illinois.edu/" class="nav-link px-2 text-white">System
+				<li class="nav-item"><a href="{{{statusURL}}}/" class="nav-link px-2 text-white">System
 						Status</a></li>
 			</ul>
 		</footer>
