@@ -10,16 +10,16 @@ function makeSecret(length) {
   return result;
 }
 
-exports.groups_permitted = ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
+exports.groups_permitted = process.env.groupsPermitted.split(',') || ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
 
 exports.branding = {
-  title: "ACM Link Shortener",
-  loginProvider: "ACM",
-  logoPath: "/static/img/white-banner.svg",
-  orgHome: "https://acm.illinois.edu",
-  statusURL: "https://status.acm.illinois.edu",
-  copyrightOwner: "ACM @ UIUC",
-  domainHint: "acm.illinois.edu" // primary azure AD domain for tenant.
+  title: process.env.brandTitle || "ACM Link Shortener",
+  loginProvider: process.env.brandLoginProvider ||"ACM",
+  logoPath: process.env.brandLogoPath || "/static/img/white-banner.svg",
+  orgHome: process.env.brandOrgHome || "https://acm.illinois.edu",
+  statusURL: process.env.brandStatusURL || "https://status.acm.illinois.edu",
+  copyrightOwner: process.env.brandCopyrightOwner || "ACM @ UIUC",
+  domainHint: process.env.brandDomainHint || "acm.illinois.edu" // primary azure AD domain for tenant.
 }
 
 exports.creds = {
