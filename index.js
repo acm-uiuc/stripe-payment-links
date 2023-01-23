@@ -53,7 +53,7 @@ function getRandomURL() {
   }
   return result;
 }
-const secret = process.env.NODE_ENV === "development" ? "secret" : process.env.COOKIE_KEY
+const secret = process.env.COOKIE_KEY || "secret";
 app.use(session({
   secret: secret,
   resave: false,
