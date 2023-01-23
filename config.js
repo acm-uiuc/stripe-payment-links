@@ -70,10 +70,11 @@ exports.creds = {
     // Required if `useCookieInsteadOfSession` is set to true. You can provide multiple set of key/iv pairs for key
     // rollover purpose. We always use the first set of key/iv pair to encrypt cookie, but we will try every set of
     // key/iv pair to decrypt cookie. Key can be any string of length 32, and iv can be any string of length 12.
+    // Example: openssl rand -base64 12 && openssl rand -base64 32
     cookieEncryptionKeys: [ 
       {
-        'key': process.env.NODE_ENV == "development" ? "TfGVn2Sn3WjFk3GNzvIvOw8aXh16NqFC" : makeSecret(32), 
-        'iv': process.env.NODE_ENV == "development" ? "C1fRcgVZs1K7" : makeSecret(12)
+        'key': process.env.NODE_ENV == "development" ? "TfGVn2Sn3WjFk3GNzvIvOw8aXh16NqFC" : process.env.COOKIE_KEY, // len 32
+        'iv': process.env.NODE_ENV == "development" ? "C1fRcgVZs1K7" : process.env.COOKIE_IV // len 12
       },
     ],
   
