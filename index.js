@@ -42,16 +42,7 @@ app.engine('html', hogan);
 
 // Create a session-store to be used by both the express-session
 // middleware and the keycloak middleware.
-function makeSecret() {
-  const length = 64;
-  let result           = '';
-  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]\;\',./<>?:"{}|';
-  const charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
+
 function getRandomURL() {
   const length = 6;
   let result           = '';

@@ -1,14 +1,5 @@
 require('dotenv').config()
 
-function makeSecret(length) {
-  let result           = '';
-  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]\;\',./<>?:"{}|';
-  const charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
 
 exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
 
