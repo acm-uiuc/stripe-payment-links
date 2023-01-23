@@ -4,17 +4,40 @@ Linkry is an internal tool for shortening links and reducing link rot by redirec
 
 ## Installation
 
-Ensure that you have [Node](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/) installed on your machine. For non-ACM users, configure config.js to use your AAD tenant's client ID.
-Then, run the following commands:
+Pull the published Docker container using the appropriate version: `docker pull ghcr.io/acm-uiuc/linkry:latest`.
+
+Create a `.env` file that contains the following keys:
 ```bash
-yarn
-export proto=http
-export baseURL=localhost:9215
-export SESSION_DB_FILE_LOC=$PWD
-export SESSION_DB_FILE_NAME=db.sqlite3 
-export DB_FILE=db.sqlite3
-export CLIENT_SECRET=<your azure AD secret here>
-yarn dev
+NODE_ENV=production # or development if in development mode
+BASE_URL=go.acm.illinois.edu # production URL
+BASE_PROTO=https # http vs. https
+AAD_CLIENT_ID=0 # Client ID in Azure Active Directory (ensure idtoken flow is enabled).
+AAD_TENANT_ID=0 # Azure AD Tenant ID
+AAD_CLIENT_SECRET= # Azure AD client secret for respective client ID. 
+brandTitle=ACM Link Shortener # HTML title
+brandLoginProvider=ACM # Custom name for AAD Auth Provider
+brandLogoPath=https://go.acm.illinois.edu/static/img/white-banner.svg # path to banner logo 
+brandOrgHome=https://acm.illinois.edu # main home page
+brandStatusURL=https://status.acm.illinois.edu # Status page
+brandCopyrightOwner=ACM @ UIUC # Corporation Name
+brandDomainHint=devksingh.com # Azure AD Domain Hint
+DB_FILE=/usr/src/app/db.sqlite3 # where the DB of links is.
+GROUPS_PERMITTED=ACM Link Shortener Admins, ACM Exec # Groups that can access the link shortener
+```
+Then, use the following docker-compose.yml in the same directory and run `docker-compose up` to start the application (it will be exposed on port 9215):
+```yml
+version: '3'
+services:
+  linkry:
+    image: ghcr.io/acm-uiuc/linkry:latest
+    restart: on-failure
+    environment:
+      - DB_FILE=/usr/src/app/db.sqlite3
+    ports:
+      - "9215:9215"
+    volumes:
+      - ./.env:/usr/src/app/.env
+      - ./db.sqlite3:/usr/src/app/db.sqlite3
 ```
 
 ## Usage
@@ -29,3 +52,4 @@ Maintainer: Dev Singh (<dsingh14@illinois.edu>)
 
 ## License
 [BSD 3-Clause](https://raw.githubusercontent.com/acm-uiuc/linkry/master/LICENSE)
+
