@@ -314,7 +314,10 @@ app.post('/auth/openid/return',
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
 app.get('/logout', function(req, res){
-  req.session = null;
+  res.clearCookie('connect.sid');
+  res.clearCookie('session');
+  res.clearCookie('session.sig');
+  res.redirect('/');
 });
 
 function validateArray(userGroups, accessGroups) {
