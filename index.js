@@ -39,6 +39,11 @@ var server = app.listen(9215, function () {
 app.set('view engine', 'html');
 app.set('views', require('path').join(__dirname, '/view'));
 app.engine('html', hogan);
+const partials = {
+  smallNavbar: 'components/smallNavbar',
+  fullNavbar: 'components/fullNavbar',
+  footer: 'components/footer',
+}
 
 // Create a session-store to be used by both the express-session
 // middleware and the keycloak middleware.
@@ -271,7 +276,7 @@ app.get('/error', (req, res) => {
   res.status(500).send("An error occurred.")
 });
 app.get('/unauthorized', (req, res) => {
-  return res.status(401).render('unauthorized.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
+  return res.status(401).render('unauthorized.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
 });
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
@@ -309,30 +314,9 @@ app.post('/auth/openid/return',
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
 app.get('/logout', function(req, res){
-  req.session.destroy(function(err) {
-    req.logOut();
-    res.redirect(config.destroySessionUrl);
-  });
+  req.session = null;
 });
-function intersect_safe(a, b)
-{
-  var ai=0, bi=0;
-  var result = [];
 
-  while( ai < a.length && bi < b.length )
-  {
-     if      (a[ai] < b[bi] ){ ai++; }
-     else if (a[ai] > b[bi] ){ bi++; }
-     else /* they're equal */
-     {
-       result.push(a[ai]);
-       ai++;
-       bi++;
-     }
-  }
-
-  return result;
-}
 function validateArray(userGroups, accessGroups) {
   for (const item of userGroups) {
     if (accessGroups.includes(item)) {
@@ -357,12 +341,12 @@ app.use(async (req, res, next) => {
 
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) { return res.redirect('/create') }
-  res.render('home.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
+  res.render('home.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
   return
 })
 
 app.get('/create', ensureAuthenticated, async function (req, res) {
-  res.render('index.html', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
+  res.render('index.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
   return
 })
 
@@ -425,6 +409,12 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   })
   delegatedLinks = delegatedLinks.filter(word => word.email != email);
   res.render('mylinks', {
+    partials,
+    productName: config.branding.title, 
+    logoPath: config.branding.logoPath,
+    copyrightOwner: config.branding.copyrightOwner,
+    statusURL: config.branding.statusURL,
+    orgHome: config.branding.orgHome,
     data,
     name,
     email,
@@ -504,11 +494,11 @@ app.get('/:id', async function (req, res) {
       res.redirect(atob(url[0].url))
       return
     } else {
-      res.status(404).render('404', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
+      res.status(404).render('404', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
       return
     }
   } catch {
-    res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
+    res.status(500).render('500', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
     return
   }
 

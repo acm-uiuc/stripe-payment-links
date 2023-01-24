@@ -14,36 +14,7 @@
 </head>
 
 <body class="epoch-dark epoch-font">
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand text-light" href="/">
-                <img src="{{{logoPath}}}"
-                    height="50">&nbsp;&nbsp;Link Shortener
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto flex-nowrap mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-light" aria-current="page" href="/mylinks">My Links</a>
-                    </li>
-                </ul>
-                <div class="dropstart dropdown-menu-md">
-                    <a href="#" class="d-block text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                      Signed in as: {{name}}
-                    </a>
-                    <ul class="dropdown-menu text-small">
-                      <li><a class="dropdown-item disabled" href="#">Email: {{email}}</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                    </ul>
-                  </div>
-            </div>
-        </div>
-    </nav>
+    {{> fullNavbar }}
     <div class="container epoch-child-light">
         <br /><br />
         <h1>Shorten a URL</h1>
@@ -78,21 +49,8 @@
         {{/userGroups.length}}
         <button class="btn btn-primary" onclick="submitData()">Shorten!</button>
     </div>
-    <div class="container fixed-bottom">
-        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-            <div class="col-md-4 d-flex align-items-center">
-                <span class="mb-3 mb-md-0 text-white">©
-                    <script>document.write(new Date().getFullYear())</script> {{{copyrightOwner}}}
-                </span>
-            </div>
-            <ul class="nav col-md-4 justify-content-end">
-                <li class="nav-item"><a href="{{{orgHome}}}" class="nav-link px-2 text-white">{{{copyrightOwner}}}
-                        Home</a></li>
-                <li class="nav-item"><a href="{{{statusURL}}}/" class="nav-link px-2 text-white">System
-                        Status</a></li>
-            </ul>
-        </footer>
-    </div>
+    {{> footer}}
+
 </body>
 
 </html>
