@@ -343,10 +343,6 @@ app.use(async (req, res, next) => {
 app.get('/', async function (req, res) {
   
   if (req.isAuthenticated()) { return res.redirect('/create') }
-  res.clearCookie('connect.sid', {path:'/'});
-  res.clearCookie('session', {path:'/'});
-  res.clearCookie('session.sig', {path:'/'});
-  
   res.render('home.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
   return
 })
