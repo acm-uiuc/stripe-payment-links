@@ -61,8 +61,6 @@ function getRandomURL() {
 const secret = process.env.COOKIE_KEY || "secret";
 app.use(session({
   secret: secret,
-  resave: false,
-  saveUninitialized: true,
 }));
 
 //-----------------------------------------------------------------------------
@@ -264,7 +262,6 @@ app.get('/login',
         resourceURL: config.resourceURL,    // optional. Provide a value if you want to specify the resource.
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
         failureRedirect: '/error',
-        useCookieInsteadOfSession: true,
         domain_hint: config.branding.domainHint
       }
     )(req, res, next);
@@ -314,9 +311,10 @@ app.post('/auth/openid/return',
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
 app.get('/logout', function(req, res){
-  res.clearCookie('connect.sid');
-  res.clearCookie('session');
-  res.clearCookie('session.sig');
+  res.clearCookie('connect.sid', {path:'/'});
+  res.clearCookie('session', {path:'/'});
+  res.clearCookie('session.sig', {path:'/'});
+  req.session=null;
   res.redirect('/');
 });
 
@@ -343,7 +341,12 @@ app.use(async (req, res, next) => {
 // begin business logic
 
 app.get('/', async function (req, res) {
+  
   if (req.isAuthenticated()) { return res.redirect('/create') }
+  res.clearCookie('connect.sid', {path:'/'});
+  res.clearCookie('session', {path:'/'});
+  res.clearCookie('session.sig', {path:'/'});
+  
   res.render('home.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
   return
 })
