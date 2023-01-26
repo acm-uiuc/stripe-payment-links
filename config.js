@@ -1,7 +1,9 @@
 require('dotenv').config()
 
 
-exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Infra Leadership'];
+exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Officers', 'ACM Infra Leadership'];
+
+exports.admin_groups = process.env.ADMIN_GROUPS ? process.env.ADMIN_GROUPS.split(',') : ['ACM Infra Leadership'];
 
 exports.branding = {
   title: process.env.brandTitle || "ACM Link Shortener",

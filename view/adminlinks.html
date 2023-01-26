@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<noscript>Your browser does not support JavaScript, but this site requires JavaScript!</noscript>
+
+<head>
+    <title>{{{productName}}}</title>
+    <meta property="og:title" content="{{{productName}}}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/epoch.css">
+    <script src="/static/js/mylinks.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<script>
+    async function handleRemove(name) {
+        const sure = confirm(`Are you sure you would like to remove this link? Anyone visiting {{baseURL}}/${name} will recieve an error!`);
+        if (!sure) {
+            alert("Remove cancelled.")
+            return
+        }
+        const response = await fetch(`/deleteLink?name=${name}`, {
+            method: "DELETE"
+        })
+        const parsed = await response.json()
+        if (response.status !== 200) {
+            alert(parsed.message)
+        } else {
+            alert("URL removed successfully!")
+            document.getElementById(`urldata-${name}`).parentNode.removeChild(document.getElementById(`urldata-${name}`))
+        }
+    }
+</script>
+
+<body class="epoch-dark epoch-font epoch-child-light">
+    {{>fullNavbar}}
+    <br />
+    <div class="container">
+        <h1 style="text-align: center;">All shortened links</h1>
+        <br />
+        <table style="width:100%" class="table table-striped">
+            <tr>
+                <th style="text-align: center;" scope="col">Original</th>
+                <th style="text-align: center;" scope="col">Shortened</th>
+                <th style="text-align: center;" scope="col">Owner</th>
+                <th style="text-align: center;" scope="col">Groups</th>
+                <th style="text-align: center;" scope="col">Actions</th>
+            </tr>
+            {{#data}}
+            <tr id="urldata-{{name}}">
+                <td style="text-align: center;"><a id="urldata-{{name}}-url" href="{{url}}">{{url}}</a></td>
+                <td style="text-align: center;"><a href="/{{name}}">{{baseURL}}/{{name}}</a></td>
+                <td style="text-align: center;"><a>{{email}}</a></td>
+                <td style="text-align: center;"><a>{{{groups}}}</a></td>
+                <td style="text-align: center;"><button type="button" class="btn btn-danger"
+                        onclick="handleRemove('{{name}}', '{{url}}')">Remove Link</button><a>&nbsp;</a><button
+                        type="button" class="btn btn-warning" onclick="handleEdit('{{name}}')">Edit Link</button></a>
+                </td>
+            </tr>
+            {{/data}}
+        </table>
+    </div>
+    {{> footer}}
+
+</body>
+
+</html>

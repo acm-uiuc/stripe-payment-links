@@ -166,6 +166,7 @@ async function addURLToDB(name, url, email, groups) {
     })
   })
 }
+
 async function getDataForEmail(email) {
   return new Promise(function(resolve, reject) {
     db.serialize(function() {
@@ -180,6 +181,22 @@ async function getDataForEmail(email) {
     })
   })
 }
+
+async function getAllLinks() {
+  return new Promise(function(resolve, reject) {
+    db.serialize(function() {
+      const stmt = db.prepare("SELECT * FROM urlData");
+      stmt.all([], function(err, data) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+  })
+}
+
 
 async function getDelegatedLinks(userGroups) {
   return new Promise(function(resolve, reject) {
@@ -332,12 +349,22 @@ app.use(async (req, res, next) => {
   if (!req.user) {return next();}
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = validateArray(config.groups_permitted, req.user._json.groups);
-  if (!intserect){
+  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
+  if (!intserect && !intersect2){
     return res.status(401).redirect("/unauthorized");
   }
   next();
 })
 
+app.use('/admin/', async (req, res, next) => {
+  if (!req.user) {return next();}
+  req.user._json.groups = await getUserGroups(req.user.oid, gat);
+  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
+  if (!intersect2){
+    return res.status(401).redirect("/unauthorized");
+  }
+  next();
+})
 // begin business logic
 
 app.get('/', async function (req, res) {
@@ -422,6 +449,32 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
     email,
     baseURL,
     delegatedLinks,
+    productName: config.branding.title
+  })
+})
+
+app.get('/admin/links', ensureAuthenticated, async function (req, res) {
+  const email = req.user._json.preferred_username;
+  const name = req.user.displayName;
+  const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
+  let data = await getAllLinks().catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
+  data = data.map((item) => {
+    const d = item;
+    d.url = atob(d.url);
+    d.groups = d.groups.replace(',', "<br />")
+    return d;
+  })
+  res.render('adminlinks', {
+    partials,
+    productName: config.branding.title, 
+    logoPath: config.branding.logoPath,
+    copyrightOwner: config.branding.copyrightOwner,
+    statusURL: config.branding.statusURL,
+    orgHome: config.branding.orgHome,
+    data,
+    name,
+    email,
+    baseURL,
     productName: config.branding.title
   })
 })
