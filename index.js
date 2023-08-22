@@ -12,7 +12,7 @@ const atob = require('atob');
 const config = require('./config');
 
 require('dotenv').config()
-const {BASE_PROTO} = process.env;
+const { BASE_PROTO } = process.env;
 const baseURL = process.env.BASE_URL;
 
 if (!baseURL || !BASE_PROTO) {
@@ -50,11 +50,11 @@ const partials = {
 
 function getRandomURL() {
   const length = 6;
-  let result           = '';
-  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   const charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
@@ -69,11 +69,11 @@ app.use(session({
 // this will be as simple as storing the user ID when serializing, and finding
 // the user by ID when deserializing.
 //-----------------------------------------------------------------------------
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user.oid);
 });
 
-passport.deserializeUser(function(oid, done) {
+passport.deserializeUser(function (oid, done) {
   findByOid(oid, function (err, user) {
     done(err, user);
   });
@@ -82,7 +82,7 @@ passport.deserializeUser(function(oid, done) {
 // array to hold logged in users
 var users = [];
 
-var findByOid = function(oid, fn) {
+var findByOid = function (oid, fn) {
   for (var i = 0, len = users.length; i < len; i++) {
     var user = users[i];
     if (user.oid === oid) {
@@ -102,45 +102,45 @@ getUserGroups = async (oid, accessToken) => {
     redirect: 'follow'
   };
   return await fetch(`https://graph.microsoft.com/v1.0/users/${oid}/transitiveMemberOf/microsoft.graph.group?$select=displayName`, requestOptions)
-  .then(response => response.json())
-  .then(result => {
-    let groups;
-    let cleanGroups;
-    try {
-      groups = result.value;
-      cleanGroups = groups.map(x => x["displayName"])
-      return cleanGroups
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
-    
-  })
-  .catch(error => console.log('error', error));
+    .then(response => response.json())
+    .then(result => {
+      let groups;
+      let cleanGroups;
+      try {
+        groups = result.value;
+        cleanGroups = groups.map(x => x["displayName"])
+        return cleanGroups
+      } catch (e) {
+        console.error(e);
+        return [];
+      }
+
+    })
+    .catch(error => console.log('error', error));
 }
 
 var gat = "";
 passport.use(new OIDCStrategy(config.creds,
-function(iss, sub, profile, accessToken, refreshToken, done) {
-  if (!profile.oid) {
-    return done(new Error("No oid found"), null);
-  }
-  // asynchronous verification, for effect...
-  process.nextTick(function () {
-    findByOid(profile.oid, async function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      gat = accessToken;
-      profile._json.groups = await getUserGroups(profile.oid, accessToken)
-      users.push(profile);
-      return done(null, profile);
+  function (iss, sub, profile, accessToken, refreshToken, done) {
+    if (!profile.oid) {
+      return done(new Error("No oid found"), null);
+    }
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      findByOid(profile.oid, async function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        gat = accessToken;
+        profile._json.groups = await getUserGroups(profile.oid, accessToken)
+        users.push(profile);
+        return done(null, profile);
+      });
     });
-  });
-}
+  }
 ));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended : true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(passport.initialize());
 app.use(passport.session());
@@ -150,17 +150,31 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login');
 };
-
+function checkIfAdmin(req) {
+  const userGroups = new Set(req.user._json.groups !== undefined ? req.user._json.groups : []);
+  const adminGroups = new Set(config.admin_groups);
+  for (const key of userGroups) {
+    if (adminGroups.has(key)) {
+      return true;
+    }
+  }
+  return false;
+}
+function ensureAdmin(req, res, next) {
+  if (!req.isAuthenticated()) { return res.redirect("/login"); }
+  if (checkIfAdmin(req)) { return next() }
+  return res.redirect('/unauthorized')
+};
 
 async function addURLToDB(name, url, email, groups) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("INSERT INTO urlData (name, url, email, groups) VALUES (?, ?, ?, ?)");
-      stmt.run([name, url, email, groups], function(err) {
+      stmt.run([name, url, email, groups], function (err) {
         if (err) {
           reject(err)
         } else {
-          resolve({name, url, email})
+          resolve({ name, url, email })
         }
       })
     })
@@ -168,10 +182,10 @@ async function addURLToDB(name, url, email, groups) {
 }
 
 async function getDataForEmail(email) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("SELECT * FROM urlData WHERE email=?");
-      stmt.all([email], function(err, data) {
+      stmt.all([email], function (err, data) {
         if (err) {
           reject(err)
         } else {
@@ -183,10 +197,10 @@ async function getDataForEmail(email) {
 }
 
 async function getAllLinks() {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("SELECT * FROM urlData");
-      stmt.all([], function(err, data) {
+      stmt.all([], function (err, data) {
         if (err) {
           reject(err)
         } else {
@@ -199,18 +213,18 @@ async function getAllLinks() {
 
 
 async function getDelegatedLinks(userGroups) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("SELECT * FROM urlData;");
-      stmt.all([], function(err, allData) {
+      stmt.all([], function (err, allData) {
         if (err) {
           reject(err)
         } else {
           allData = allData.map(item => {
             if (item.groups === null) {
-              return item;    
+              return item;
             }
-            item.groups = item.groups.split(','); 
+            item.groups = item.groups.split(',');
             return item;
           })
           const data = allData.filter(item => {
@@ -219,7 +233,7 @@ async function getDelegatedLinks(userGroups) {
               compareGroups = item.groups
             }
             const mergedArray = userGroups.filter(value => compareGroups.includes(value));
-            return mergedArray.length > 0 
+            return mergedArray.length > 0
           })
           resolve(data)
         }
@@ -229,10 +243,10 @@ async function getDelegatedLinks(userGroups) {
 }
 
 async function removeURLfromDB(name) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("DELETE FROM urlData WHERE name=?");
-      stmt.run([name], function(err) {
+      stmt.run([name], function (err) {
         if (err) {
           reject(err)
         } else {
@@ -243,10 +257,10 @@ async function removeURLfromDB(name) {
   })
 }
 async function getRedirectURL(name) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("SELECT url FROM urlData WHERE name=?");
-      stmt.all([name], function(err, data) {
+      stmt.all([name], function (err, data) {
         if (err) {
           reject(err)
         } else {
@@ -257,14 +271,14 @@ async function getRedirectURL(name) {
   })
 }
 async function updateRecord(name, url) {
-  return new Promise(function(resolve, reject) {
-    db.serialize(function() {
+  return new Promise(function (resolve, reject) {
+    db.serialize(function () {
       const stmt = db.prepare("UPDATE urlData SET url=?, name=? WHERE name=?");
-      stmt.run([url, name, name], function(err) {
+      stmt.run([url, name, name], function (err) {
         if (err) {
           reject(err)
         } else {
-          resolve({name, url})
+          resolve({ name, url })
         }
       })
     })
@@ -272,9 +286,9 @@ async function updateRecord(name, url) {
 }
 
 app.get('/login',
-  function(req, res, next) {
-    passport.authenticate('azuread-openidconnect', 
-      { 
+  function (req, res, next) {
+    passport.authenticate('azuread-openidconnect',
+      {
         response: res,                      // required
         resourceURL: config.resourceURL,    // optional. Provide a value if you want to specify the resource.
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
@@ -283,29 +297,29 @@ app.get('/login',
       }
     )(req, res, next);
   },
-  function(req, res) {
+  function (req, res) {
     res.redirect('/');
-});
+  });
 app.get('/error', (req, res) => {
   res.status(500).send("An error occurred.")
 });
 app.get('/unauthorized', (req, res) => {
-  return res.status(401).render('unauthorized.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,groups: config.groups_permitted.toString().replaceAll(",", "<br />")});
+  return res.status(401).render('unauthorized.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, groups: config.groups_permitted.toString().replaceAll(",", "<br />"), adminGroups: config.admin_groups.toString().replaceAll(",", "<br />") });
 });
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
 // query (such as authorization code). If authentication fails, user will be
 // redirected to '/' (home page); otherwise, it passes to the next middleware.
 app.get('/auth/openid/return',
-  function(req, res, next) {
-    passport.authenticate('azuread-openidconnect', 
-      { 
+  function (req, res, next) {
+    passport.authenticate('azuread-openidconnect',
+      {
         response: res,    // required
-        failureRedirect: '/'  
+        failureRedirect: '/'
       }
     )(req, res, next);
   },
-  function(req, res) {
+  function (req, res) {
     res.redirect('/');
   });
 
@@ -314,24 +328,24 @@ app.get('/auth/openid/return',
 // body (such as authorization code). If authentication fails, user will be
 // redirected to '/' (home page); otherwise, it passes to the next middleware.
 app.post('/auth/openid/return',
-  function(req, res, next) {
-    passport.authenticate('azuread-openidconnect', 
-      { 
+  function (req, res, next) {
+    passport.authenticate('azuread-openidconnect',
+      {
         response: res,    // required
-        failureRedirect: '/'  
+        failureRedirect: '/'
       }
     )(req, res, next);
   },
-  function(req, res) {
+  function (req, res) {
     res.redirect('/create');
   });
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
-app.get('/logout', function(req, res){
-  res.clearCookie('connect.sid', {path:'/'});
-  res.clearCookie('session', {path:'/'});
-  res.clearCookie('session.sig', {path:'/'});
-  req.session=null;
+app.get('/logout', function (req, res) {
+  res.clearCookie('connect.sid', { path: '/' });
+  res.clearCookie('session', { path: '/' });
+  res.clearCookie('session.sig', { path: '/' });
+  req.session = null;
   res.redirect('/');
 });
 
@@ -346,36 +360,40 @@ function validateArray(userGroups, accessGroups) {
 
 // group access check
 app.use(async (req, res, next) => {
-  if (!req.user) {return next();}
+  if (!req.user) { return next(); }
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = validateArray(config.groups_permitted, req.user._json.groups);
   const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
-  if (!intserect && !intersect2){
+  if (!intserect && !intersect2) {
     return res.status(401).redirect("/unauthorized");
   }
   next();
 })
 
-app.use('/admin/', async (req, res, next) => {
-  if (!req.user) {return next();}
-  req.user._json.groups = await getUserGroups(req.user.oid, gat);
-  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
-  if (!intersect2){
-    return res.status(401).redirect("/unauthorized");
-  }
-  next();
-})
+app.use('/admin/', ensureAdmin)
 // begin business logic
 
 app.get('/', async function (req, res) {
-  
+
   if (req.isAuthenticated()) { return res.redirect('/create') }
-  res.render('home.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,loginProvider: config.branding.loginProvider});
+  res.render('home.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, loginProvider: config.branding.loginProvider });
   return
 })
 
 app.get('/create', ensureAuthenticated, async function (req, res) {
-  res.render('index.html', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome,email: req.user._json.preferred_username, name: req.user.displayName, baseURL, userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => {return {group: item}}) :  {}})
+  res.render('index.html', { 
+    partials,
+    productName: config.branding.title,
+    logoPath: config.branding.logoPath,
+    copyrightOwner: config.branding.copyrightOwner,
+    statusURL: config.branding.statusURL,
+    orgHome: config.branding.orgHome,
+    email: req.user._json.preferred_username,
+    name: req.user.displayName,
+    baseURL,
+    userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => { return { group: item } }) : {},
+    isAdminUser: checkIfAdmin(req)
+  })
   return
 })
 
@@ -384,7 +402,7 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
   const url = req.query.url;
   const name = req.query.name;
   const groups = req.body.groups
-  if (url.indexOf(baseURL) > -1 ) {
+  if (url.indexOf(baseURL) > -1) {
     res.json({
       message: `The origin URL cannot be a path of ${baseURL}`
     })
@@ -422,15 +440,15 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
 app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
-  const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
-  let data = await getDataForEmail(email).catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
+  const userGroups = req.user._json.groups !== undefined ? req.user._json.groups : [];
+  let data = await getDataForEmail(email).catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
   data = data.map((item) => {
     const d = item;
     d.url = atob(d.url);
     d.groups = d.groups.replace(',', "<br />")
     return d;
   })
-  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
+  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
   delegatedLinks = delegatedLinks.map((item) => {
     const d = item;
     d.url = atob(d.url);
@@ -439,7 +457,7 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
   delegatedLinks = delegatedLinks.filter(word => word.email != email);
   res.render('mylinks', {
     partials,
-    productName: config.branding.title, 
+    productName: config.branding.title,
     logoPath: config.branding.logoPath,
     copyrightOwner: config.branding.copyrightOwner,
     statusURL: config.branding.statusURL,
@@ -449,15 +467,16 @@ app.get('/mylinks', ensureAuthenticated, async function (req, res) {
     email,
     baseURL,
     delegatedLinks,
-    productName: config.branding.title
+    productName: config.branding.title,
+    isAdminUser: checkIfAdmin(req)
   })
 })
 
 app.get('/admin/links', ensureAuthenticated, async function (req, res) {
   const email = req.user._json.preferred_username;
   const name = req.user.displayName;
-  const userGroups =  req.user._json.groups !== undefined ? req.user._json.groups : [];
-  let data = await getAllLinks().catch(() => {res.status(500).render('500', {productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,}); return});
+  const userGroups = req.user._json.groups !== undefined ? req.user._json.groups : [];
+  let data = await getAllLinks().catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
   data = data.map((item) => {
     const d = item;
     d.url = atob(d.url);
@@ -466,7 +485,7 @@ app.get('/admin/links', ensureAuthenticated, async function (req, res) {
   })
   res.render('adminlinks', {
     partials,
-    productName: config.branding.title, 
+    productName: config.branding.title,
     logoPath: config.branding.logoPath,
     copyrightOwner: config.branding.copyrightOwner,
     statusURL: config.branding.statusURL,
@@ -475,7 +494,8 @@ app.get('/admin/links', ensureAuthenticated, async function (req, res) {
     name,
     email,
     baseURL,
-    productName: config.branding.title
+    productName: config.branding.title,
+    isAdminUser: checkIfAdmin(req)
   })
 })
 
@@ -496,7 +516,7 @@ app.delete('/deleteLink', ensureAuthenticated, async function (req, res) {
 app.put('/updateLink', ensureAuthenticated, async function (req, res) {
   const name = req.query.name;
   const url = req.query.url;
-  if (url.indexOf(baseURL) > -1 ) {
+  if (url.indexOf(baseURL) > -1) {
     res.json({
       message: `The origin URL cannot be a path of ${baseURL}`
     })
@@ -516,7 +536,7 @@ app.get('/getRandomURL', ensureAuthenticated, async function (req, res) {
   let exists = true;
   let generatedURL = '';
   let i = 0;
-  while(exists) {
+  while (exists) {
     try {
       generatedURL = getRandomURL();
       const url = await getRedirectURL(generatedURL);
@@ -525,18 +545,18 @@ app.get('/getRandomURL', ensureAuthenticated, async function (req, res) {
         throw new Error("In a generation loop, must exit.")
       }
     } catch {
-      res.status(500).json({success: false})
+      res.status(500).json({ success: false })
       return
     }
   }
   try {
     if (generatedURL !== '') {
-      res.json({success: true, generatedURL})
+      res.json({ success: true, generatedURL })
       return
     }
     throw new Error("Did not actually generate a new URL.")
   } catch {
-    res.status(500).json({success: false})
+    res.status(500).json({ success: false })
     return
   }
 })
@@ -549,11 +569,11 @@ app.get('/:id', async function (req, res) {
       res.redirect(atob(url[0].url))
       return
     } else {
-      res.status(404).render('404', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
+      res.status(404).render('404', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, })
       return
     }
   } catch {
-    res.status(500).render('500', {partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL,})
+    res.status(500).render('500', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, })
     return
   }
 
