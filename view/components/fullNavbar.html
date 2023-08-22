@@ -14,6 +14,11 @@
                 <li class="nav-item">
                     <a class="nav-link text-light" aria-current="page" href="/mylinks">My Links</a>
                 </li>
+                {{#isAdminUser}}
+                <li class="nav-item">
+                    <a class="nav-link text-light" aria-current="page" href="/admin/links">Admin Portal</a>
+                </li>
+                {{/isAdminUser}}
             </ul>
             <div class="dropstart dropdown-menu-md">
                 <a href="#" class="d-block text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
