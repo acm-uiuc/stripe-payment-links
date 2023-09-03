@@ -63,6 +63,17 @@ app.use(session({
   secret: secret,
 }));
 
+
+function isDefinedRoute(name) {
+  // prevent the user from using well-defined routes as a short URL
+  app._router.stack.forEach(function(r){
+    if (r.route && r.route.path && r.route.path == `/${name}`){
+      return true
+    }
+  })
+  return false;
+}
+
 //-----------------------------------------------------------------------------
 // To support persistent login sessions, Passport needs to be able to
 // serialize users into and deserialize users out of the session.  Typically,
@@ -146,10 +157,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use('/static', express.static('public'))
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login');
+
+async function ensureAuthenticated(req, res, next) {
+  if (!req.user) { return res.redirect('/login'); }
+  req.user._json.groups = await getUserGroups(req.user.oid, gat);
+  const intserect = validateArray(config.groups_permitted, req.user._json.groups);
+  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
+  if (!intserect && !intersect2) {
+    return res.status(401).redirect("/unauthorized");
+  }
+  next();
 };
+
 function checkIfAdmin(req) {
   const userGroups = new Set(req.user._json.groups !== undefined ? req.user._json.groups : []);
   const adminGroups = new Set(config.admin_groups);
@@ -358,23 +377,9 @@ function validateArray(userGroups, accessGroups) {
   return false;
 }
 
-// group access check
-app.use(async (req, res, next) => {
-  if (!req.user) { return next(); }
-  req.user._json.groups = await getUserGroups(req.user.oid, gat);
-  const intserect = validateArray(config.groups_permitted, req.user._json.groups);
-  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
-  if (!intserect && !intersect2) {
-    return res.status(401).redirect("/unauthorized");
-  }
-  next();
-})
-
 app.use('/admin/', ensureAdmin)
-// begin business logic
 
 app.get('/', async function (req, res) {
-
   if (req.isAuthenticated()) { return res.redirect('/create') }
   res.render('home.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, loginProvider: config.branding.loginProvider });
   return
@@ -402,11 +407,15 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
   const url = req.query.url;
   const name = req.query.name;
   const groups = req.body.groups
+  if (isDefinedRoute(name)) {
+    return res.status(409).json({
+      message: "This short URL is reserved by the system. Please try another."
+    })
+  }
   if (url.indexOf(baseURL) > -1) {
-    res.json({
+    return res.json({
       message: `The origin URL cannot be a path of ${baseURL}`
     })
-    return
   }
   if (url === undefined || name === undefined) {
     res.status(400).json({
@@ -417,7 +426,7 @@ app.post('/addURL', ensureAuthenticated, async function (req, res) {
   addURLToDB(name, url, email, groups).then((obj) => {
     res.json({
       url: obj.url,
-      shortURL: `https://go.epochml.org/${obj.name}`,
+      shortURL: `${config.branding.externalDomain}/${obj.name}`,
       email: obj.email,
       groups: groups
     });

@@ -12,7 +12,9 @@ exports.branding = {
   orgHome: process.env.brandOrgHome || "https://acm.illinois.edu",
   statusURL: process.env.brandStatusURL || "https://status.acm.illinois.edu",
   copyrightOwner: process.env.brandCopyrightOwner || "ACM @ UIUC",
-  domainHint: process.env.brandDomainHint || "acm.illinois.edu" // primary azure AD domain for tenant.
+  domainHint: process.env.brandDomainHint || "acm.illinois.edu", // primary azure AD domain for tenant.
+  externalDomain: process.env.externalDomain || "https://go.acm.illinois.edu"
+
 }
 
 exports.creds = {
