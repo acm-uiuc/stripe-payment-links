@@ -186,6 +186,7 @@ function ensureAdmin(req, res, next) {
 };
 
 async function addURLToDB(name, url, email, groups) {
+  console.log("adding",  name, url, email, groups)
   return new Promise(function (resolve, reject) {
     db.serialize(function () {
       const stmt = db.prepare("INSERT INTO urlData (name, url, email, groups) VALUES (?, ?, ?, ?)");
