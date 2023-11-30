@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <a class="navbar-brand text-light" href="/">
             <img src="{{{logoPath}}}"
-                height="50">&nbsp;&nbsp;Link Shortener
+                height="50">&nbsp;&nbsp;{{{productName}}}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -11,14 +11,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto flex-nowrap mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link text-light" aria-current="page" href="/mylinks">My Links</a>
-                </li>
-                {{#isAdminUser}}
-                <li class="nav-item">
-                    <a class="nav-link text-light" aria-current="page" href="/admin/links">Admin Portal</a>
-                </li>
-                {{/isAdminUser}}
             </ul>
             <div class="dropstart dropdown-menu-md">
                 <a href="#" class="d-block text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

@@ -1,21 +1,22 @@
 require('dotenv').config()
 
 
-exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Link Shortener Managers', 'ACM Exec', 'ACM Officers', 'ACM Infra Leadership'];
+exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Exec', 'ACM Officers', 'Infra Chairs'];
 
-exports.admin_groups = process.env.ADMIN_GROUPS ? process.env.ADMIN_GROUPS.split(',') : ['ACM Infra Leadership', 'ACM Officers'];
 
 exports.branding = {
-  title: process.env.brandTitle || "ACM Link Shortener",
+  title: process.env.brandTitle || "Stripe Link Creator",
   loginProvider: process.env.brandLoginProvider ||"ACM",
   logoPath: process.env.brandLogoPath || "/static/img/white-banner.svg",
   orgHome: process.env.brandOrgHome || "https://acm.illinois.edu",
   statusURL: process.env.brandStatusURL || "https://status.acm.illinois.edu",
   copyrightOwner: process.env.brandCopyrightOwner || "ACM @ UIUC",
   domainHint: process.env.brandDomainHint || "acm.illinois.edu", // primary azure AD domain for tenant.
-  externalDomain: process.env.externalDomain || "https://go.acm.illinois.edu"
+  externalDomain: process.env.externalDomain || "https://stripelinks.acm.illinois.edu"
 
 }
+
+exports.STRIPE_KEY = process.env.STRIPE_KEY
 
 exports.creds = {
     // Required

@@ -1,12 +1,12 @@
 {
-  "name": "linkry-link-shortener",
-  "version": "1.5.0",
+  "name": "acm-stripe-link-creator",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "DB_FILE=${PWD}/db.sqlite3 forever start index.js",
+    "start": "forever start index.js",
     "stop": "forever stop index.js",
-    "dev": "DB_FILE=${PWD}/db.sqlite3 nodemon index.js",
+    "dev": "nodemon index.js",
     "container-start": "node index.js"
   },
   "author": "Dev Singh <dsingh14@illinois.edu>",
@@ -27,6 +27,6 @@
     "passport": "^0.5.2",
     "passport-azure-ad": "^4.3.1",
     "serve-favicon": "^2.5.0",
-    "sqlite3": "^5.1.4"
+    "stripe": "^14.7.0"
   }
 }

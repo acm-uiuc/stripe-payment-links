@@ -44,7 +44,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/acm-uiuc/linkry:latest,ghcr.io/acm-uiuc/linkry:${{github.ref_name}}
+          tags: ghcr.io/acm-uiuc/stripe-links:latest,ghcr.io/acm-uiuc/stripe-links:${{github.ref_name}}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 

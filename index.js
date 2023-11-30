@@ -2,12 +2,10 @@ const hogan = require('hogan-express');
 const express = require('express');
 const session = require('cookie-session');
 const favicon = require('serve-favicon');
-const sqlite3 = require('sqlite3')
 const passport = require('passport')
 const fetch = require('node-fetch')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
-const atob = require('atob');
 
 const config = require('./config');
 
@@ -23,12 +21,7 @@ if (!baseURL || !BASE_PROTO) {
 }
 
 console.log("Node env: ", process.env.NODE_ENV)
-var db = new sqlite3.Database(process.env.DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
-  if (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
-})
+
 
 var app = express();
 var server = app.listen(9215, function () {
@@ -63,16 +56,6 @@ app.use(session({
   secret: secret,
 }));
 
-
-function isDefinedRoute(name) {
-  // prevent the user from using well-defined routes as a short URL
-  app._router.stack.forEach(function(r){
-    if (r.route && r.route.path && r.route.path == `/${name}`){
-      return true
-    }
-  })
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 // To support persistent login sessions, Passport needs to be able to
@@ -162,148 +145,14 @@ async function ensureAuthenticated(req, res, next) {
   if (!req.user) { return res.redirect('/login'); }
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = validateArray(config.groups_permitted, req.user._json.groups);
-  const intersect2 = validateArray(config.admin_groups, req.user._json.groups)
   if (!intserect && !intersect2) {
     return res.status(401).redirect("/unauthorized");
   }
   next();
 };
 
-function checkIfAdmin(req) {
-  const userGroups = new Set(req.user._json.groups !== undefined ? req.user._json.groups : []);
-  const adminGroups = new Set(config.admin_groups);
-  for (const key of userGroups) {
-    if (adminGroups.has(key)) {
-      return true;
-    }
-  }
-  return false;
-}
-function ensureAdmin(req, res, next) {
-  if (!req.isAuthenticated()) { return res.redirect("/login"); }
-  if (checkIfAdmin(req)) { return next() }
-  return res.redirect('/unauthorized')
-};
 
-async function addURLToDB(name, url, email, groups) {
-  console.log("adding",  name, url, email, groups)
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("INSERT INTO urlData (name, url, email, groups) VALUES (?, ?, ?, ?)");
-      stmt.run([name, url, email, groups], function (err) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve({ name, url, email })
-        }
-      })
-    })
-  })
-}
-
-async function getDataForEmail(email) {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("SELECT * FROM urlData WHERE email=?");
-      stmt.all([email], function (err, data) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data)
-        }
-      })
-    })
-  })
-}
-
-async function getAllLinks() {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("SELECT * FROM urlData");
-      stmt.all([], function (err, data) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data)
-        }
-      })
-    })
-  })
-}
-
-
-async function getDelegatedLinks(userGroups) {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("SELECT * FROM urlData;");
-      stmt.all([], function (err, allData) {
-        if (err) {
-          reject(err)
-        } else {
-          allData = allData.map(item => {
-            if (item.groups === null) {
-              return item;
-            }
-            item.groups = item.groups.split(',');
-            return item;
-          })
-          const data = allData.filter(item => {
-            let compareGroups = []
-            if (item.groups !== null) {
-              compareGroups = item.groups
-            }
-            const mergedArray = userGroups.filter(value => compareGroups.includes(value));
-            return mergedArray.length > 0
-          })
-          resolve(data)
-        }
-      })
-    })
-  })
-}
-
-async function removeURLfromDB(name) {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("DELETE FROM urlData WHERE name=?");
-      stmt.run([name], function (err) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(name)
-        }
-      })
-    })
-  })
-}
-async function getRedirectURL(name) {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("SELECT url FROM urlData WHERE name=?");
-      stmt.all([name], function (err, data) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data)
-        }
-      })
-    })
-  })
-}
-async function updateRecord(name, url) {
-  return new Promise(function (resolve, reject) {
-    db.serialize(function () {
-      const stmt = db.prepare("UPDATE urlData SET url=?, name=? WHERE name=?");
-      stmt.run([url, name, name], function (err) {
-        if (err) {
-          reject(err)
-        } else {
-          resolve({ name, url })
-        }
-      })
-    })
-  })
-}
+const stripe = require('stripe')(config.STRIPE_KEY)
 
 app.get('/login',
   function (req, res, next) {
@@ -324,7 +173,7 @@ app.get('/error', (req, res) => {
   res.status(500).send("An error occurred.")
 });
 app.get('/unauthorized', (req, res) => {
-  return res.status(401).render('unauthorized.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, groups: config.groups_permitted.toString().replaceAll(",", "<br />"), adminGroups: config.admin_groups.toString().replaceAll(",", "<br />") });
+  return res.status(401).render('unauthorized.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, groups: config.groups_permitted.toString().replaceAll(",", "<br />") });
 });
 // 'GET returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
@@ -335,12 +184,12 @@ app.get('/auth/openid/return',
     passport.authenticate('azuread-openidconnect',
       {
         response: res,    // required
-        failureRedirect: '/'
+        failureRedirect: '/error'
       }
     )(req, res, next);
   },
   function (req, res) {
-    res.redirect('/');
+    res.redirect('/create');
   });
 
 // 'POST returnURL'
@@ -378,12 +227,9 @@ function validateArray(userGroups, accessGroups) {
   return false;
 }
 
-app.use('/admin/', ensureAdmin)
-
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) { return res.redirect('/create') }
   res.render('home.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, loginProvider: config.branding.loginProvider });
-  return
 })
 
 app.get('/create', ensureAuthenticated, async function (req, res) {
@@ -398,193 +244,42 @@ app.get('/create', ensureAuthenticated, async function (req, res) {
     name: req.user.displayName,
     baseURL,
     userGroups: req.user._json.groups !== undefined ? req.user._json.groups.map((item) => { return { group: item } }) : {},
-    isAdminUser: checkIfAdmin(req)
   })
-  return
 })
 
-app.post('/addURL', ensureAuthenticated, async function (req, res) {
-  const email = req.user._json.preferred_username;
-  const url = req.query.url;
-  const name = req.query.name;
-  const groups = req.body.groups
-  if (isDefinedRoute(name)) {
-    return res.status(409).json({
-      message: "This short URL is reserved by the system. Please try another."
-    })
-  }
-  if (url.indexOf(baseURL) > -1) {
-    return res.json({
-      message: `The origin URL cannot be a path of ${baseURL}`
-    })
-  }
-  if (url === undefined || name === undefined) {
-    res.status(400).json({
-      message: "Either url or name was not provided."
-    })
-    return
-  }
-  addURLToDB(name, url, email, groups).then((obj) => {
-    res.json({
-      url: obj.url,
-      shortURL: `${config.branding.externalDomain}/${obj.name}`,
-      email: obj.email,
-      groups: groups
+app.post('/paylink', ensureAuthenticated, async function (req, res) {
+  try {
+    const email = req.user._json.preferred_username;
+    const { amnt, invoice, contactName, contactEmail } = req.body
+    const description = `Payment for Invoice ID ${invoice} \nContact Name: ${contactName}\nContact Email: ${contactEmail}\nCreated By: ${email}`
+    const product = await stripe.products.create({
+      name: `Payment for Invoice: ${invoice}`,
+      description
     });
-  }).catch((err) => {
-    if (err.errno == 19) {
-      res.status(409).json({
-        message: "This short URL has already been taken. Please try another."
-      })
-    } else {
-      res.status(500).json({
-        message: "The short URL could not be added. Please try again."
-      })
-    }
-
-  })
-  return
+    const price = await stripe.prices.create({
+      currency: 'usd',
+      unit_amount: amnt * 100,
+      product: product.id
+    })
+    const paymentLink = await stripe.paymentLinks.create({
+      line_items: [
+        {
+          price: price.id,
+          quantity: 1,
+        },
+      ],
+    });
+    console.log(paymentLink.url)
+    return res.json({
+      success: true,
+      message: paymentLink.url
+    })
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Could not create link."
+    })
+  }
 
 });
 
-app.get('/mylinks', ensureAuthenticated, async function (req, res) {
-  const email = req.user._json.preferred_username;
-  const name = req.user.displayName;
-  const userGroups = req.user._json.groups !== undefined ? req.user._json.groups : [];
-  let data = await getDataForEmail(email).catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
-  data = data.map((item) => {
-    const d = item;
-    d.url = atob(d.url);
-    d.groups = d.groups.replace(',', "<br />")
-    return d;
-  })
-  let delegatedLinks = await getDelegatedLinks(userGroups).catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
-  delegatedLinks = delegatedLinks.map((item) => {
-    const d = item;
-    d.url = atob(d.url);
-    return d;
-  })
-  delegatedLinks = delegatedLinks.filter(word => word.email != email);
-  res.render('mylinks', {
-    partials,
-    productName: config.branding.title,
-    logoPath: config.branding.logoPath,
-    copyrightOwner: config.branding.copyrightOwner,
-    statusURL: config.branding.statusURL,
-    orgHome: config.branding.orgHome,
-    data,
-    name,
-    email,
-    baseURL,
-    delegatedLinks,
-    productName: config.branding.title,
-    isAdminUser: checkIfAdmin(req)
-  })
-})
-
-app.get('/admin/links', ensureAuthenticated, async function (req, res) {
-  const email = req.user._json.preferred_username;
-  const name = req.user.displayName;
-  const userGroups = req.user._json.groups !== undefined ? req.user._json.groups : [];
-  let data = await getAllLinks().catch(() => { res.status(500).render('500', { productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, }); return });
-  data = data.map((item) => {
-    const d = item;
-    d.url = atob(d.url);
-    d.groups = d.groups.replace(',', "<br />")
-    return d;
-  })
-  res.render('adminlinks', {
-    partials,
-    productName: config.branding.title,
-    logoPath: config.branding.logoPath,
-    copyrightOwner: config.branding.copyrightOwner,
-    statusURL: config.branding.statusURL,
-    orgHome: config.branding.orgHome,
-    data,
-    name,
-    email,
-    baseURL,
-    productName: config.branding.title,
-    isAdminUser: checkIfAdmin(req)
-  })
-})
-
-app.delete('/deleteLink', ensureAuthenticated, async function (req, res) {
-  const name = req.query.name;
-  removeURLfromDB(name).then(() => {
-    res.json({
-      name, deleted: true
-    })
-    return
-  }).catch(() => {
-    res.status(500).json({
-      message: "Could not delete the link. Please try again."
-    })
-    return
-  })
-})
-app.put('/updateLink', ensureAuthenticated, async function (req, res) {
-  const name = req.query.name;
-  const url = req.query.url;
-  if (url.indexOf(baseURL) > -1) {
-    res.json({
-      message: `The origin URL cannot be a path of ${baseURL}`
-    })
-    return
-  }
-  updateRecord(name, url).then((data) => {
-    res.json(data);
-    return;
-  }).catch(() => {
-    res.status(500).json({
-      message: "Could not update the link. Please try again."
-    })
-    return
-  })
-})
-app.get('/getRandomURL', ensureAuthenticated, async function (req, res) {
-  let exists = true;
-  let generatedURL = '';
-  let i = 0;
-  while (exists) {
-    try {
-      generatedURL = getRandomURL();
-      const url = await getRedirectURL(generatedURL);
-      exists = url[0] !== undefined;
-      if (i > 10) {
-        throw new Error("In a generation loop, must exit.")
-      }
-    } catch {
-      res.status(500).json({ success: false })
-      return
-    }
-  }
-  try {
-    if (generatedURL !== '') {
-      res.json({ success: true, generatedURL })
-      return
-    }
-    throw new Error("Did not actually generate a new URL.")
-  } catch {
-    res.status(500).json({ success: false })
-    return
-  }
-})
-app.get('/:id', async function (req, res) {
-  const name = req.params.id;
-  const ts = Date.now();
-  try {
-    const url = await getRedirectURL(name)
-    if (url[0] !== undefined) {
-      res.redirect(atob(url[0].url))
-      return
-    } else {
-      res.status(404).render('404', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, })
-      return
-    }
-  } catch {
-    res.status(500).render('500', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, })
-    return
-  }
-
-})

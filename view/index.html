@@ -17,37 +17,36 @@
     {{> fullNavbar }}
     <div class="container epoch-child-light">
         <br /><br />
-        <h1>Shorten a URL</h1>
+        <h1>Create a Payment Link</h1>
         <div class="mb-3">
-            <label for="name" class="form-label">Alias</label>
+            <label for="name" class="form-label">Payment Amount (USD)</label>
             <div class="input-group mb-3">
-                <span class="input-group-text text-dark" id="basic-addon3">{{baseURL}}/</span>
-                <input type="text" class="form-control text-dark" id="name" aria-describedby="nameHelp">
-                <button class="btn btn-primary" onclick="getRandomURL()">Generate Random Short URL</button>
+                <span class="input-group-text text-dark" id="basic-addon3">$</span>
+                <input type="text" class="form-control text-dark" id="amnt" aria-describedby="amntHelp">
             </div>
-            <div id="urlHelp" class="form-text">Enter the alias which will redirect to your original site.</div>
+            <div id="urlHelp" class="form-text">Minimum $0.50.</div>
         </div>
         <div class="mb-3">
-            <label for="url" class="form-label">URL to shorten</label>
-            <input type="text" class="form-control text-dark" id="url" aria-describedby="urlHelp">
-            <div id="urlHelp" class="form-text">Enter a valid web URL.</div>
-        </div>
-        {{#userGroups.length}}
-        <div class="mb-3">
-            <h2 id="delegate-header">Delegate Access</h2>
-            <label for="delegate-header" class="form-label">Select groups that are permitted to manage this
-                link.</label>
-            {{#userGroups}}
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="{{group}}-check">
-                <label class="form-check-label" for="{{group}}-check">
-                    {{group}}
-                </label>
+            <label for="name" class="form-label">Invoice Number</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control text-dark" id="invoice" aria-describedby="invoiceHelp">
             </div>
-            {{/userGroups}}
+            <div id="urlHelp" class="form-text">Enter the invoice number (make sure it is prefixed with a unique prefix for your group to avoid processing delays).</div>
         </div>
-        {{/userGroups.length}}
-        <button class="btn btn-primary" onclick="submitData()">Shorten!</button>
+        <div class="mb-3">
+            <label for="name" class="form-label">Payer Contact Name</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control text-dark" id="contactName" aria-describedby="contactName">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Payer Contact Email</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control text-dark" id="contactEmail" aria-describedby="contactEmail">
+            </div>
+        </div>
+      
+        <button class="btn btn-primary" id="submit" onclick="submitData()">Create Link!</button>
     </div>
 
 </body>
