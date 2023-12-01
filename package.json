@@ -22,6 +22,7 @@
     "forever": "^4.0.1",
     "hogan-express": "^0.5.2",
     "hogan-express-partials": "^0.0.4",
+    "joi": "^17.11.0",
     "node-fetch": "2",
     "nodemon": "^2.0.13",
     "passport": "^0.5.2",

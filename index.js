@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('cookie-session');
 const favicon = require('serve-favicon');
 const passport = require('passport')
+const Joi = require('joi'); 
 const fetch = require('node-fetch')
 var OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 var cookieParser = require('cookie-parser');
@@ -248,6 +249,21 @@ app.get('/create', ensureAuthenticated, async function (req, res) {
 })
 
 app.post('/paylink', ensureAuthenticated, async function (req, res) {
+  const schema = Joi.object().keys({
+    amnt: Joi.number().greater(0.5).required(),
+    invoice: Joi.string().required(),
+    contactName: Joi.string().required(),
+    contactEmail: Joi.string().email().required()
+  })
+  const { body } = req;
+  const {error} = schema.validate(body);
+  const valid = error === null;
+  if (!valid) {
+    return res.status(422).json({
+      success: false,
+      message: error.details[0].message
+    })
+  }
   try {
     const email = req.user._json.preferred_username;
     const { amnt, invoice, contactName, contactEmail } = req.body
