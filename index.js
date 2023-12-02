@@ -163,7 +163,8 @@ app.get('/login',
         resourceURL: config.resourceURL,    // optional. Provide a value if you want to specify the resource.
         customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
         failureRedirect: '/error',
-        domain_hint: config.branding.domainHint
+        domain_hint: config.branding.domainHint,
+        prompt: 'select_account'
       }
     )(req, res, next);
   },
@@ -176,22 +177,6 @@ app.get('/error', (req, res) => {
 app.get('/unauthorized', (req, res) => {
   return res.status(401).render('unauthorized.html', { partials, productName: config.branding.title, logoPath: config.branding.logoPath, copyrightOwner: config.branding.copyrightOwner, statusURL: config.branding.statusURL, orgHome: config.branding.orgHome, groups: config.groups_permitted.toString().replaceAll(",", "<br />") });
 });
-// 'GET returnURL'
-// `passport.authenticate` will try to authenticate the content returned in
-// query (such as authorization code). If authentication fails, user will be
-// redirected to '/' (home page); otherwise, it passes to the next middleware.
-app.get('/auth/openid/return',
-  function (req, res, next) {
-    passport.authenticate('azuread-openidconnect',
-      {
-        response: res,    // required
-        failureRedirect: '/error'
-      }
-    )(req, res, next);
-  },
-  function (req, res) {
-    res.redirect('/create');
-  });
 
 // 'POST returnURL'
 // `passport.authenticate` will try to authenticate the content returned in
@@ -201,8 +186,12 @@ app.post('/auth/openid/return',
   function (req, res, next) {
     passport.authenticate('azuread-openidconnect',
       {
-        response: res,    // required
-        failureRedirect: '/'
+        response: res,                      // required
+        resourceURL: config.resourceURL,    // optional. Provide a value if you want to specify the resource.
+        customState: 'my_state',            // optional. Provide a value if you want to provide custom state value.
+        failureRedirect: '/error',
+        domain_hint: config.branding.domainHint,
+        prompt: 'select_account'
       }
     )(req, res, next);
   },
