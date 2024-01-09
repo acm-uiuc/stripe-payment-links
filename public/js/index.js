@@ -9,6 +9,7 @@ async function submitData() {
         }
         bodyconst[item] = it
     }
+    bodyconst['amnt'] = parseFloat(bodyconst['amnt'])
     const response = await fetch(`/paylink`, {
         method: "POST",
         headers: {

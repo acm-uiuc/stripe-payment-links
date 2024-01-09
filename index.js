@@ -146,7 +146,7 @@ async function ensureAuthenticated(req, res, next) {
   if (!req.user) { return res.redirect('/login'); }
   req.user._json.groups = await getUserGroups(req.user.oid, gat);
   const intserect = validateArray(config.groups_permitted, req.user._json.groups);
-  if (!intserect && !intersect2) {
+  if (!intserect) {
     return res.status(401).redirect("/unauthorized");
   }
   next();
@@ -246,8 +246,7 @@ app.post('/paylink', ensureAuthenticated, async function (req, res) {
   })
   const { body } = req;
   const {error} = schema.validate(body);
-  const valid = error === null;
-  if (!valid) {
+  if (error) {
     return res.status(422).json({
       success: false,
       message: error.details[0].message
