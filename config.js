@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 
-exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Exec', 'ACM Officers', 'Infra Chairs'];
+exports.groups_permitted = process.env.GROUPS_PERMITTED ? process.env.GROUPS_PERMITTED.split(',') : ['ACM Exec', 'ACM Officers', 'ACM Infra Chairs', 'Stripe Link Creators'];
 
 
 exports.branding = {
